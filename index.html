@@ -15,7 +15,6 @@
         #result {
             margin-top: 20px;
             font-size: 18px;
-            color: red;
         }
         input {
             padding: 10px;
@@ -32,15 +31,19 @@
         button:hover {
             background-color: darkred;
         }
+        .correct {
+            color: lime;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <h1>Orbis Arcana - The First Gate</h1>
-<br>
+    <br>
     
-    <p>"I am not light, yet I guide the way. I have no voice, yet I reveal truth. You see me every day, but only the seekers will understand."<p>
-<br>
+    <p>"I am not light, yet I guide the way. I have no voice, yet I reveal truth. You see me every day, but only the seekers will understand."</p>
+    <br>
     <p>Enter the answer to proceed:</p>
 
     <input type="text" id="answerInput" placeholder="Your answer...">
@@ -53,7 +56,7 @@
             var answer = document.getElementById("answerInput").value.toLowerCase();
             if (answer === "shadow") { 
                 document.getElementById("result").innerHTML = 
-                    "Correct. Welcome to the Circle. <br><br> <a href='https://discord.gg/jZthKB8Esv' style='color:lime;'>Enter Orbis Arcana</a>";
+                    "<span class='correct'>Correct. Welcome to the Circle.</span> <br><br> <a href='https://discord.gg/jZthKB8Esv' style='color:lime;'>Enter Orbis Arcana</a>";
             } else {
                 document.getElementById("result").innerHTML = "Incorrect. The path remains closed.";
             }
