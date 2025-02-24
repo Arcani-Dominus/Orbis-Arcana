@@ -45,11 +45,11 @@
     <h1>Orbis Arcana - The First Gate</h1>
     <br>
     
-    <p>"I have no substance, yet I follow you close.
-I vanish in darkness but thrive in the glow.
-Without light, I cannot be,
-Yet in its presence, you’ll always see me.
-What am I?"</p>
+    <p>"I have no substance, yet I follow you close.  
+       I vanish in darkness but thrive in the glow.  
+       Without light, I cannot be,  
+       Yet in its presence, you’ll always see me.  
+       What am I?"</p>
     <br>
     <p>Enter the answer to proceed:</p>
 
@@ -60,7 +60,7 @@ What am I?"</p>
 
     <script>
         function checkAnswer() {
-            var answer = document.getElementById("answerInput").value.toLowerCase();
+            var answer = document.getElementById("answerInput").value.toLowerCase().trim(); // Trim spaces
             var result = document.getElementById("result");
 
             if (answer === "shadow") { 
