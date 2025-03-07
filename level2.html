@@ -8,70 +8,51 @@
 </head>
 <body>
     <div id="container">
+        <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
         <h1 class="title">Orbis Arcana</h1>
-        <h2 class="subtitle">Level 2</h2>
+        <h2 class="subtitle">The Second Gate</h2>
 
         <p><i>"The more you take, the more you leave behind. What am I?"</i></p>
-
+        
         <p><strong>Enter the answer to proceed:</strong></p>
         <input type="text" id="answerInput" placeholder="Your answer...">
-        <button onclick="checkAnswer()">Submit</button>
-
+        <button id="submitButton" onclick="checkAnswer()">Submit</button>
         <p id="result"></p>
 
-        <hr>
-
-        <!-- Leaderboard Section -->
-        <h2 class="subtitle">Leaderboard</h2>
-        <ul id="leaderboard"></ul>
-
-        <hr>
-
-        <!-- Announcements Section -->
-        <h2 class="subtitle">Announcements</h2>
+        <!-- Announcements -->
+        <h2 class="subtitle">📢 Announcements</h2>
         <div id="announcements"></div>
+
+        <!-- Leaderboard Button -->
+        <button id="leaderboardButton" onclick="toggleLeaderboard()">📜 View Leaderboard</button>
+        <div id="leaderboard" class="hidden"></div>
     </div>
 
     <script type="module">
-        // Import Firebase configuration
         import { db } from "./firebase-config.js";
-        import { doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { doc, getDoc, collection, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-        function checkAnswer() {
+        async function checkAnswer() {
             const answer = document.getElementById("answerInput").value.toLowerCase().trim();
             const result = document.getElementById("result");
 
-            if (answer === "footsteps") {
-                result.innerHTML = "<span class='correct glow'>Correct! Proceeding to the next level...</span>";
-                setTimeout(() => window.location.href = "level3.html", 2000);
+            if (answer === "footsteps") { 
+                result.innerHTML = "<span class='correct glow-text'>Correct! Proceeding to the next challenge...</span>";
+                document.getElementById("submitButton").classList.add("glow-button");
+
+                // Simulate a delay before moving to the next level
+                setTimeout(() => {
+                    window.location.href = "level3.html";
+                }, 2000);
             } else {
-                result.innerHTML = "<span class='incorrect'>Incorrect. Try again.</span>";
+                result.innerHTML = "<span class='incorrect'>Incorrect. The gate remains closed.</span>";
             }
         }
 
-        async function loadLeaderboard() {
-            const leaderboard = document.getElementById("leaderboard");
-            leaderboard.innerHTML = "";
-
-            const querySnapshot = await getDocs(collection(db, "players"));
-            const players = [];
-
-            querySnapshot.forEach(doc => {
-                players.push(doc.data());
-            });
-
-            players.sort((a, b) => b.level - a.level);
-
-            players.forEach((player, index) => {
-                const li = document.createElement("li");
-                li.textContent = `#${index + 1} ${player.name} - Level ${player.level}`;
-                leaderboard.appendChild(li);
-            });
-        }
-
+        // Load Announcements
         async function loadAnnouncements() {
             const announcementsDiv = document.getElementById("announcements");
-            announcementsDiv.innerHTML = "";
+            announcementsDiv.innerHTML = "Loading...";
 
             const docRef = doc(db, "global", "announcements");
             const docSnap = await getDoc(docRef);
@@ -83,7 +64,34 @@
             }
         }
 
-        loadLeaderboard();
+        // Load Leaderboard
+        async function loadLeaderboard() {
+            const leaderboardDiv = document.getElementById("leaderboard");
+            leaderboardDiv.innerHTML = "<p>Loading...</p>";
+
+            const querySnapshot = await getDocs(collection(db, "players"));
+            let leaderboardHTML = "<h3>🏆 Leaderboard</h3><ul>";
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                leaderboardHTML += `<li>${data.name} - Level ${data.level}</li>`;
+            });
+
+            leaderboardHTML += "</ul>";
+            leaderboardDiv.innerHTML = leaderboardHTML;
+        }
+
+        function toggleLeaderboard() {
+            const leaderboardDiv = document.getElementById("leaderboard");
+            if (leaderboardDiv.classList.contains("hidden")) {
+                loadLeaderboard();
+                leaderboardDiv.classList.remove("hidden");
+            } else {
+                leaderboardDiv.classList.add("hidden");
+            }
+        }
+
+        // Load everything when page opens
         loadAnnouncements();
     </script>
 </body>
