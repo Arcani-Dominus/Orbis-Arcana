@@ -88,9 +88,14 @@
 </head>
 <body>
     <div id="container">
-        <h1>Orbis Arcana - The Treasure Hunt</h1>
-        <p>Solve the riddle to proceed:</p>
-        <p><strong>What has keys but can't open locks?</strong></p>
+        <h1><span style="font-size: 32px;">Orbis Arcana</span><br><span style="font-size: 24px;">The First Gate</span></h1>
+        
+        <p><strong>I have no substance, yet I follow you close.  
+           I vanish in darkness but thrive in the glow.  
+           Without light, I cannot be,  
+           Yet in its presence, you’ll always see me.  
+           What am I?
+</strong></p>
         
         <input type="text" id="answerInput" placeholder="Enter your answer">
         <button onclick="checkAnswer()">Submit</button>
@@ -102,9 +107,21 @@
             <input type="text" id="studentID" placeholder="Student ID">
             <button onclick="registerPlayer()">Register & Proceed</button>
         </div>
-        
     </div>
 
-    <script src="script.js" type="module"></script>
+    <script>
+        function checkAnswer() {
+            var answer = document.getElementById("answerInput").value.toLowerCase().trim();
+            var result = document.createElement("p");
+            result.id = "result";
+            document.getElementById("container").appendChild(result);
+
+            if (answer === "piano") { 
+                result.innerHTML = "<span class='correct'>Correct. Welcome to the Circle.</span>";
+            } else {
+                result.innerHTML = "<span class='incorrect'>Incorrect. The path remains closed.</span>";
+            }
+        }
+    </script>
 </body>
 </html>
