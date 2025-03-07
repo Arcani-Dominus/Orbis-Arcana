@@ -7,7 +7,7 @@
 }
 
 body {
-    background: url('charlesdeluvio-pcZvxrAyYoQ-unsplash.jpg') no-repeat center center fixed;
+    background: url('background.jpg') no-repeat center center fixed;
     background-size: cover;
     color: #e0e0e0;
     text-align: center;
@@ -19,133 +19,106 @@ body {
     padding: 10px;
 }
 
-/* Container Box */
 #container {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.6);
     padding: 20px;
     border-radius: 10px;
-    max-width: 75%;
-    min-width: 280px;
+    max-width: 80%;
+    min-width: 300px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
 }
 
-/* Logo (Smaller Size) */
 .logo {
-    width: 50px;  /* Reduced size */
-    height: auto;
-    margin-bottom: 5px;
+    max-width: 100px;
+    margin-bottom: 10px;
 }
 
-/* Titles and Text */
 .title {
     color: #ffcc00;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: bold;
 }
 
 .subtitle {
     color: #e0e0e0;
-    font-size: 18px;
-    margin-bottom: 15px;
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
-p {
-    font-size: 14px;
-    margin: 10px 0;
-    line-height: 1.5;
-}
-
-/* Input Fields */
 input {
-    padding: 8px;
-    font-size: 14px;
     width: 80%;
-    border: 1px solid #888;
-    background: #222;
-    color: #fff;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #ffcc00;
     border-radius: 5px;
-    outline: none;
-    margin-top: 6px;
+    background: #222;
+    color: #e0e0e0;
+    font-size: 16px;
+    text-align: center;
 }
 
-/* Submit Button */
 button {
-    padding: 10px 18px;
-    font-size: 14px;
-    font-weight: bold;
-    background: #333;
+    padding: 10px;
+    font-size: 16px;
+    background: #222;
     color: #ffcc00;
     border: 2px solid #ffcc00;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 8px;
     transition: 0.3s;
-    position: relative;
-    overflow: hidden;
 }
 
-/* Button Hover Effect */
 button:hover {
     background: #ffcc00;
     color: black;
-    box-shadow: 0px 0px 15px #ffcc00;
 }
 
-/* Glowing Effect on Correct Answer */
+button.glow {
+    animation: glow 1.5s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 5px #ffcc00;
+    }
+    to {
+        box-shadow: 0 0 15px #ffcc00;
+    }
+}
+
 .correct {
-    color: #66ffcc;
-    font-size: 16px;
+    color: #66ff66;
     font-weight: bold;
-    text-shadow: 0px 0px 10px #66ffcc;
+    text-shadow: 0 0 10px #66ff66;
 }
 
-/* Incorrect Answer */
 .incorrect {
     color: #ff6666;
-    font-size: 16px;
     font-weight: bold;
 }
 
-/* Link Button */
-#enterLink {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 8px 16px;
-    font-size: 12px;
-    font-weight: bold;
-    text-decoration: none;
-    color: #000;
-    background: #ffcc00;
-    border-radius: 5px;
-    transition: 0.3s;
-    box-shadow: 0px 0px 10px #ffcc00;
-}
-
-#enterLink:hover {
-    background: #fff;
-    color: #ffcc00;
-    box-shadow: 0px 0px 15px #ffcc00;
-}
-
-/* Leaderboard and Announcements */
 .section-container {
     margin-top: 20px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
 }
 
 .section-title {
-    font-size: 18px;
-    color: #ffcc00;
-    text-decoration: underline;
     cursor: pointer;
+    color: #ffcc00;
+    font-size: 18px;
+    text-decoration: underline;
+    transition: 0.3s;
+}
+
+.section-title:hover {
+    color: #fff;
 }
 
 .section-content {
     display: none;
-    background: rgba(255, 255, 255, 0.1);
     padding: 10px;
-    border-radius: 5px;
-    margin-top: 10px;
-}
-
-.section-content p {
-    font-size: 14px;
+    text-align: left;
 }
