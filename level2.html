@@ -8,90 +8,92 @@
 </head>
 <body>
     <div id="container">
-        <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
-        <h1 class="title">ORBIS ARCANA</h1>
-        <h2 class="subtitle">The Second Gate</h2>
+        <img src="logo.png" alt="Orbis Arcana Logo" class="logo">
+        <h1 class="title">Orbis Arcana</h1>
+        <h2 class="subtitle">Level 2</h2>
 
-        <p><i>"The more you take, the more you leave behind. What am I?"</i></p>
-        
-        <p><strong>Enter the answer to proceed:</strong></p>
-        <input type="text" id="answerInput" placeholder="Your answer...">
-        <button id="submitButton" onclick="checkAnswer()">Submit</button>
+        <p><strong>Riddle:</strong> The more you take, the more you leave behind. What am I?</p>
+
+        <input type="text" id="answerInput" placeholder="Enter your answer">
+        <button onclick="checkAnswer()">Submit</button>
+
         <p id="result"></p>
 
-        <!-- Announcements -->
-        <h2 class="subtitle">📢 Announcements</h2>
-        <div id="announcements"></div>
+        <a id="nextLevelLink" href="level3.html" style="display: none;">Proceed to Next Level</a>
 
-        <!-- Leaderboard Button -->
-        <button id="leaderboardButton" onclick="toggleLeaderboard()">📜 View Leaderboard</button>
-        <div id="leaderboard" class="hidden"></div>
+        <!-- Leaderboard Section -->
+        <div class="section-container">
+            <h3 class="section-title" onclick="toggleSection('leaderboard')">Leaderboard</h3>
+            <div id="leaderboard" class="section-content"></div>
+        </div>
+
+        <!-- Announcements Section -->
+        <div class="section-container">
+            <h3 class="section-title" onclick="toggleSection('announcements')">Announcements</h3>
+            <div id="announcements" class="section-content"></div>
+        </div>
     </div>
 
     <script type="module">
+        // Import Firebase configuration
         import { db } from "./firebase-config.js";
-        import { doc, getDoc, collection, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+
+        const correctAnswer = "footsteps"; // Correct answer for Level 2
 
         async function checkAnswer() {
-            const answer = document.getElementById("answerInput").value.toLowerCase().trim();
+            const userAnswer = document.getElementById("answerInput").value.trim().toLowerCase();
             const result = document.getElementById("result");
+            const nextLevelLink = document.getElementById("nextLevelLink");
 
-            if (answer === "footsteps") { 
-                result.innerHTML = "<span class='correct glow-text'>Correct! Proceeding to the next challenge...</span>";
-                document.getElementById("submitButton").classList.add("glow-button");
+            if (userAnswer === correctAnswer) {
+                result.innerHTML = "<span class='correct'>Correct! 🎉</span>";
+                nextLevelLink.style.display = "block";
 
-                // Simulate a delay before moving to the next level
-                setTimeout(() => {
-                    window.location.href = "level3.html";
-                }, 2000);
+                // Update Firestore with player's progress
+                const studentID = localStorage.getItem("studentID");
+                if (studentID) {
+                    await setDoc(doc(db, "players", studentID), { level: 3 }, { merge: true });
+                }
             } else {
-                result.innerHTML = "<span class='incorrect'>Incorrect. The gate remains closed.</span>";
+                result.innerHTML = "<span class='incorrect'>Incorrect! Try again.</span>";
             }
         }
 
-        // Load Announcements
-        async function loadAnnouncements() {
-            const announcementsDiv = document.getElementById("announcements");
-            announcementsDiv.innerHTML = "Loading...";
-
-            const docRef = doc(db, "global", "announcements");
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                announcementsDiv.innerHTML = `<p>${docSnap.data().message}</p>`;
-            } else {
-                announcementsDiv.innerHTML = "<p>No announcements at the moment.</p>";
-            }
+        // Toggle visibility for leaderboard & announcements
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.style.display = section.style.display === "none" || section.style.display === "" ? "block" : "none";
         }
 
-        // Load Leaderboard
+        // Fetch and display leaderboard
         async function loadLeaderboard() {
             const leaderboardDiv = document.getElementById("leaderboard");
-            leaderboardDiv.innerHTML = "<p>Loading...</p>";
-
             const querySnapshot = await getDocs(collection(db, "players"));
-            let leaderboardHTML = "<h3>🏆 Leaderboard</h3><ul>";
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                leaderboardHTML += `<li>${data.name} - Level ${data.level}</li>`;
+            let leaderboardHTML = "<ul>";
+            querySnapshot.forEach(doc => {
+                const player = doc.data();
+                leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
             });
-
             leaderboardHTML += "</ul>";
             leaderboardDiv.innerHTML = leaderboardHTML;
         }
 
-        function toggleLeaderboard() {
-            const leaderboardDiv = document.getElementById("leaderboard");
-            if (leaderboardDiv.classList.contains("hidden")) {
-                loadLeaderboard();
-                leaderboardDiv.classList.remove("hidden");
-            } else {
-                leaderboardDiv.classList.add("hidden");
-            }
+        // Fetch and display announcements
+        async function loadAnnouncements() {
+            const announcementsDiv = document.getElementById("announcements");
+            const querySnapshot = await getDocs(collection(db, "announcements"));
+            let announcementsHTML = "<ul>";
+            querySnapshot.forEach(doc => {
+                const announcement = doc.data();
+                announcementsHTML += `<li>${announcement.message} - <em>${announcement.timestamp.toDate().toLocaleString()}</em></li>`;
+            });
+            announcementsHTML += "</ul>";
+            announcementsDiv.innerHTML = announcementsHTML;
         }
 
-        // Load everything when page opens
+        // Load leaderboard and announcements when page loads
+        loadLeaderboard();
         loadAnnouncements();
     </script>
 </body>
