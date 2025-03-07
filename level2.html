@@ -9,13 +9,13 @@
 <body>
     <div id="container">
         <img src="logo.png" alt="Orbis Arcana Logo" class="logo">
-        <h1 class="title">Orbis Arcana</h1>
+        <h1 class="title">ORBIS ARCANA</h1>
         <h2 class="subtitle">Level 2</h2>
 
         <p><strong>Riddle:</strong> The more you take, the more you leave behind. What am I?</p>
 
         <input type="text" id="answerInput" placeholder="Enter your answer">
-        <button onclick="checkAnswer()">Submit</button>
+        <button class="glow" onclick="checkAnswer()">Submit</button>
 
         <p id="result"></p>
 
@@ -35,38 +35,35 @@
     </div>
 
     <script type="module">
-        // Import Firebase configuration
         import { db } from "./firebase-config.js";
-        import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-        const correctAnswer = "footsteps"; // Correct answer for Level 2
+        const correctAnswer = "footsteps"; 
 
         async function checkAnswer() {
             const userAnswer = document.getElementById("answerInput").value.trim().toLowerCase();
             const result = document.getElementById("result");
             const nextLevelLink = document.getElementById("nextLevelLink");
+            const studentID = localStorage.getItem("studentID");
 
             if (userAnswer === correctAnswer) {
                 result.innerHTML = "<span class='correct'>Correct! 🎉</span>";
                 nextLevelLink.style.display = "block";
 
-                // Update Firestore with player's progress
-                const studentID = localStorage.getItem("studentID");
                 if (studentID) {
                     await setDoc(doc(db, "players", studentID), { level: 3 }, { merge: true });
+                    localStorage.setItem("currentLevel", 3);
                 }
             } else {
                 result.innerHTML = "<span class='incorrect'>Incorrect! Try again.</span>";
             }
         }
 
-        // Toggle visibility for leaderboard & announcements
         function toggleSection(sectionId) {
             const section = document.getElementById(sectionId);
             section.style.display = section.style.display === "none" || section.style.display === "" ? "block" : "none";
         }
 
-        // Fetch and display leaderboard
         async function loadLeaderboard() {
             const leaderboardDiv = document.getElementById("leaderboard");
             const querySnapshot = await getDocs(collection(db, "players"));
@@ -79,7 +76,6 @@
             leaderboardDiv.innerHTML = leaderboardHTML;
         }
 
-        // Fetch and display announcements
         async function loadAnnouncements() {
             const announcementsDiv = document.getElementById("announcements");
             const querySnapshot = await getDocs(collection(db, "announcements"));
@@ -92,9 +88,23 @@
             announcementsDiv.innerHTML = announcementsHTML;
         }
 
-        // Load leaderboard and announcements when page loads
+        async function restoreProgress() {
+            const studentID = localStorage.getItem("studentID");
+            const currentLevel = localStorage.getItem("currentLevel");
+            if (studentID && currentLevel >= 2) {
+                const playerRef = doc(db, "players", studentID);
+                const playerSnap = await getDoc(playerRef);
+                if (playerSnap.exists()) {
+                    if (playerSnap.data().level > 2) {
+                        window.location.href = `level${playerSnap.data().level}.html`;
+                    }
+                }
+            }
+        }
+
         loadLeaderboard();
         loadAnnouncements();
+        restoreProgress();
     </script>
 </body>
 </html>
