@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbis Arcana - Register</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: url('charlesdeluvio-pcZvxrAyYoQ-unsplash.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #e0e0e0;
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 10px;
+        }
+        #container {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 75%;
+            min-width: 280px;
+        }
+        .title { color: #ffcc00; font-size: 28px; font-weight: bold; }
+        input, button { margin-top: 10px; padding: 8px; font-size: 14px; width: 80%; }
+        button { background: #222; color: #ffcc00; border: 2px solid #ffcc00; cursor: pointer; }
+        button:hover { background: #ffcc00; color: black; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1 class="title">Orbis Arcana</h1>
+        <h2>Registration</h2>
+
+        <p><strong>Enter your details to proceed:</strong></p>
+
+        <input type="text" id="nameInput" placeholder="Your Name">
+        <input type="text" id="studentIDInput" placeholder="Your Student ID">
+        <button onclick="submitDetails()">Submit</button>
+
+        <p id="result"></p>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function submitDetails() {
+            const name = document.getElementById("nameInput").value.trim();
+            const studentID = document.getElementById("studentIDInput").value.trim();
+            const result = document.getElementById("result");
+
+            if (!name || !studentID) {
+                result.innerHTML = "<span style='color: red;'>Please enter all details.</span>";
+                return;
+            }
+
+            // Store player data in Firestore
+            await setDoc(doc(db, "players", studentID), {
+                name: name,
+                studentID: studentID,
+                level: 2,
+                timestamp: new Date()
+            });
+
+            result.innerHTML = "<span style='color: #66ffcc;'>Registration successful! Proceeding to Level 2...</span>";
+            setTimeout(() => window.location.href = "level2.html", 2000);
+        }
+    </script>
+</body>
+</html>
