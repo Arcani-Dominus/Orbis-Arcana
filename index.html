@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orbis Arcana - The First Gate</title>
+    <title>Orbis Arcana - Solve the Riddle</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,51 +39,20 @@
 
         <p>"I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?"</p>
         
-        <input type="text" id="nameInput" placeholder="Enter your Name">
-        <input type="text" id="studentIDInput" placeholder="Enter Student ID">
         <input type="text" id="answerInput" placeholder="Your answer...">
         <button onclick="checkAnswer()">Submit</button>
 
         <p id="result"></p>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyChs_NAolpqRZ-dV22bZ5KXhqXa5XuNJTI",
-            authDomain: "orbis-arcana.firebaseapp.com",
-            projectId: "orbis-arcana",
-            storageBucket: "orbis-arcana.firebasestorage.app",
-            messagingSenderId: "474107878031",
-            appId: "1:474107878031:web:0869ada48ff6a446356efa"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        async function checkAnswer() {
-            const name = document.getElementById("nameInput").value.trim();
-            const studentID = document.getElementById("studentIDInput").value.trim();
+    <script>
+        function checkAnswer() {
             const answer = document.getElementById("answerInput").value.toLowerCase().trim();
             const result = document.getElementById("result");
 
-            if (!name || !studentID) {
-                result.innerHTML = "<span style='color: red;'>Please enter your name and student ID.</span>";
-                return;
-            }
-
             if (answer === "shadow") {
-                await setDoc(doc(db, "players", studentID), {
-                    name: name,
-                    studentID: studentID,
-                    level: 2,
-                    timestamp: new Date()
-                });
-
-                result.innerHTML = "<span style='color: #66ffcc;'>Correct! Moving to Level 2...</span>";
-                setTimeout(() => window.location.href = "level2.html", 2000);
+                result.innerHTML = "<span style='color: #66ffcc;'>Correct! Proceeding to registration...</span>";
+                setTimeout(() => window.location.href = "register.html", 2000);
             } else {
                 result.innerHTML = "<span style='color: red;'>Incorrect. Try again.</span>";
             }
