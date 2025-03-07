@@ -1,13 +1,13 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyChs_NAolpqRZ-dV22bZ5KXhqXa5XuNJTI",
     authDomain: "orbis-arcana.firebaseapp.com",
     projectId: "orbis-arcana",
-    storageBucket: "orbis-arcana.appspot.com",  // Fixed incorrect ".app" to ".com"
+    storageBucket: "orbis-arcana.appspot.com",
     messagingSenderId: "474107878031",
     appId: "1:474107878031:web:0869ada48ff6a446356efa"
 };
@@ -16,36 +16,36 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Function to submit player details
-async function submitDetails() {
-    const name = document.getElementById("nameInput").value.trim();
-    const studentID = document.getElementById("studentIDInput").value.trim();
-    const result = document.getElementById("result");
+// Fetch Leaderboard Data
+async function loadLeaderboard() {
+    const leaderboardRef = collection(db, "players");
+    const q = query(leaderboardRef, orderBy("level", "desc")); // Sorting by highest level
+    const snapshot = await getDocs(q);
 
-    if (!name || !studentID) {
-        result.innerHTML = "<span style='color: red;'>Please enter all details.</span>";
-        return;
-    }
+    let leaderboardHTML = "<ol>";
+    snapshot.forEach(doc => {
+        const player = doc.data();
+        leaderboardHTML += `<li>${player.name} (Level ${player.level})</li>`;
+    });
+    leaderboardHTML += "</ol>";
 
-    try {
-        // Save to Firestore
-        await setDoc(doc(db, "players", studentID), {
-            name: name,
-            studentID: studentID,
-            level: 2,
-            timestamp: new Date()
-        });
-
-        // Store student ID locally
-        localStorage.setItem("studentID", studentID);
-
-        result.innerHTML = "<span style='color: #66ffcc;'>Registration successful! Proceeding to Level 2...</span>";
-        setTimeout(() => window.location.href = "level2.html", 2000);
-    } catch (error) {
-        console.error("Error writing document: ", error);
-        result.innerHTML = "<span style='color: red;'>An error occurred. Check console.</span>";
-    }
+    document.getElementById("leaderboard").innerHTML = leaderboardHTML;
 }
 
-// Export database
-export { db, submitDetails };
+// Fetch Announcements
+async function loadAnnouncements() {
+    const announcementsRef = collection(db, "announcements");
+    const snapshot = await getDocs(announcementsRef);
+
+    let announcementsHTML = "<ul>";
+    snapshot.forEach(doc => {
+        const announcement = doc.data();
+        announcementsHTML += `<li><strong>${announcement.title}</strong>: ${announcement.message}</li>`;
+    });
+    announcementsHTML += "</ul>";
+
+    document.getElementById("announcements").innerHTML = announcementsHTML;
+}
+
+// Load data when page loads
+export { db, loadLeaderboard, loadAnnouncements };
