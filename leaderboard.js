@@ -2,7 +2,7 @@ import { db } from "./firebase-config.js";
 import { collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 export function loadLeaderboard() {
-    console.log("📢 Loading leaderboard...");
+    console.log("📢 Loading leaderboard from Firebase...");
 
     const leaderboardRef = collection(db, "players");
     const q = query(leaderboardRef, orderBy("level", "desc"), limit(10));
