@@ -12,22 +12,22 @@
         <h1 class="title">Orbis Arcana</h1>
         <h2>Level 2</h2>
 
-        <p class="riddle">❓ The more you take, the more you leave behind. What am I?</p>
+        <p class="riddle">The more you take, the more you leave behind. What am I?</p>
         
         <input type="text" id="answerInput" placeholder="Enter your answer" class="input-field">
-        <button id="submitAnswer" class="styled-button">Submit</button>
+        <button id="submitAnswer" class="submit-button">Submit</button>
         <p id="feedback"></p>
 
         <!-- Announcements Section -->
-        <div id="announcements-section" style="display: none;">
-            <h2>📢 Announcements</h2>
-            <div id="announcements">Loading announcements...</div>
+        <div id="announcements-section">
+            <button id="toggleAnnouncements" class="toggle-button">📢 Announcements</button>
+            <div id="announcements" class="hidden">Loading announcements...</div>
         </div>
 
         <!-- Leaderboard Section -->
         <div id="leaderboard-section">
-            <button id="loadLeaderboardBtn" class="styled-button">🏆 Show Leaderboard</button>
-            <div id="leaderboard" style="display: none;"></div>
+            <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
+            <div id="leaderboard" class="hidden"></div>
         </div>
     </div>
 
@@ -90,6 +90,7 @@
         document.addEventListener("DOMContentLoaded", checkRegistration);
         document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
 
+        // Leaderboard functionality
         document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
             const leaderboard = document.getElementById("leaderboard");
             if (leaderboard.style.display === "none") {
@@ -98,6 +99,12 @@
             } else {
                 leaderboard.style.display = "none";
             }
+        });
+
+        // Toggle announcements
+        document.getElementById("toggleAnnouncements").addEventListener("click", () => {
+            const announcements = document.getElementById("announcements");
+            announcements.classList.toggle("hidden");
         });
     </script>
 </body>
