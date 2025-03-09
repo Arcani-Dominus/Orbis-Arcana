@@ -29,38 +29,42 @@ body {
     border: 1px solid #ffcc00;
 }
 
-.styled-button {
-    background-color: #4a148c; /* Theme color */
-    color: white;
-    border: none;
+/* 🔥 GOLDEN THEME BUTTONS */
+.styled-button, .submit-button, .toggle-button {
+    background-color: #222;
+    color: #ffcc00;
+    border: 1px solid #ffcc00;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 8px;
-    transition: 0.3s;
+    transition: all 0.3s ease-in-out;
 }
 
-.styled-button:hover {
-    background-color: #7b1fa2;
+.styled-button:hover, .submit-button:hover, .toggle-button:hover {
+    background-color: #ffcc00;
+    color: black;
 }
 
+/* 🔹 INPUT FIELD */
 .input-field {
     width: 80%;
     padding: 10px;
     margin: 10px 0;
-    border: 2px solid #4a148c;
+    border: 2px solid #ffcc00;
     border-radius: 8px;
     font-size: 16px;
     text-align: center;
+    background: rgba(30, 30, 30, 0.9);
+    color: #ffcc00;
 }
 
-
-/* 🔹 LOGO FIX */
+/* 🔹 LOGO */
 .logo {
-    width: 100px;  /* Adjusted for better visibility */
+    width: 100px;  
     margin: 0 auto 15px auto;
     display: block;
-    filter: drop-shadow(0px 0px 10px rgba(255, 204, 0, 0.8));  /* Glowing effect */
+    filter: drop-shadow(0px 0px 10px rgba(255, 204, 0, 0.8));
 }
 
 /* 🔹 PAGE TITLE */
@@ -69,61 +73,6 @@ body {
     font-size: 20px;
     font-weight: 700;
     margin-bottom: 15px;
-}
-
-/* 🔹 INPUT FIELDS */
-.input-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-}
-
-input {
-    padding: 10px;
-    font-size: 14px;
-    width: 100%;
-    border-radius: 5px;
-    border: 1px solid #ffcc00;
-    background: rgba(30, 30, 30, 0.9);
-    color: #ffcc00;
-    text-align: center;
-}
-
-/* 🔥 SUBMIT BUTTON */
-.submit-button {
-    margin-top: 15px;
-    padding: 10px;
-    font-size: 15px;
-    width: 100%;
-    background: #222;
-    color: #ffcc00;
-    border: 1px solid #ffcc00;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-}
-
-.submit-button:hover {
-    background: #ffcc00;
-    color: black;
-}
-
-/* 🔹 SMALL BUTTONS (Leaderboard & Announcements) */
-.toggle-button {
-    margin-top: 10px;
-    padding: 8px 12px;
-    font-size: 13px;
-    background: rgba(15, 15, 15, 0.8);
-    color: #ffcc00;
-    border: 1px solid #ffcc00;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.toggle-button:hover {
-    background: #ffcc00;
-    color: black;
 }
 
 /* 🔹 HIDE ANNOUNCEMENTS & LEADERBOARD INITIALLY */
