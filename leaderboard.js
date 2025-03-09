@@ -1,16 +1,15 @@
 import { db } from "./firebase-config.js";
-import { collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-export async function loadLeaderboard() {
-    console.log("Loading leaderboard...");
+export function loadLeaderboard() {
+    console.log("📢 Loading leaderboard...");
 
     const leaderboardRef = collection(db, "players");
     const q = query(leaderboardRef, orderBy("level", "desc"), limit(10));
+    const leaderboardElement = document.getElementById("leaderboard");
 
-    try {
-        const snapshot = await getDocs(q);
-        const leaderboardElement = document.getElementById("leaderboard");
-
+    // 🔹 Real-time listener for leaderboard
+    onSnapshot(q, (snapshot) => {
         if (snapshot.empty) {
             console.warn("No players found in Firestore.");
             leaderboardElement.innerHTML = "<p>No players yet.</p>";
@@ -25,9 +24,9 @@ export async function loadLeaderboard() {
         leaderboardHTML += "</ol>";
 
         leaderboardElement.innerHTML = leaderboardHTML;
-        console.log("Leaderboard updated successfully!");
-    } catch (error) {
-        console.error("Error fetching leaderboard:", error);
-        document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
-    }
+        console.log("✅ Leaderboard updated successfully!");
+    }, (error) => {
+        console.error("❌ Error fetching leaderboard:", error);
+        leaderboardElement.innerHTML = "<p>Error loading leaderboard.</p>";
+    });
 }
