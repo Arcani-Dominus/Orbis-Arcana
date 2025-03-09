@@ -21,29 +21,22 @@
 
         <p id="result"></p>
 
-       
+        <!-- 📢 Announcements -->
+        <div id="announcements-section">
+            <h3>📢 Announcements</h3>
+            <p id="announcements">No announcements at the moment.</p>
+        </div>
+    </div>
 
-      
+    <script type="module" src="register.js"></script>
 
-    <!-- 🔹 Scripts -->
     <script type="module">
         import { loadAnnouncements } from "./announcements.js";
-        import { loadLeaderboard } from "./leaderboard.js";
-        import { submitDetails } from "./register.js";
+        document.addEventListener("DOMContentLoaded", loadAnnouncements);
+    </script>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadAnnouncements();
-        });
-
+    <script>
         document.getElementById("submitBtn").addEventListener("click", submitDetails);
-
-        document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-            const leaderboard = document.getElementById("leaderboard");
-            leaderboard.classList.toggle("hidden");
-            if (!leaderboard.classList.contains("hidden")) {
-                loadLeaderboard();
-            }
-        });
     </script>
 
 </body>
