@@ -39,21 +39,7 @@ function loadLeaderboard() {
     });
 }
 
-// 🔥 Real-Time Announcements Updates
-function loadAnnouncements() {
-    const announcementsRef = collection(db, "announcements");
 
-    onSnapshot(announcementsRef, (snapshot) => {
-        let announcementsHTML = "<ul>";
-        snapshot.forEach(doc => {
-            const announcement = doc.data();
-            announcementsHTML += `<li><strong>${announcement.title}</strong>: ${announcement.message}</li>`;
-        });
-        announcementsHTML += "</ul>";
-
-        document.getElementById("announcements").innerHTML = announcementsHTML;
-    });
-}
 
 // Load real-time data when the page loads
-export { db, loadLeaderboard, loadAnnouncements };
+export { db, loadLeaderboard };
