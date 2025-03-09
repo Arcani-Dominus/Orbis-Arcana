@@ -16,7 +16,7 @@
         <div class="input-container">
             <input type="text" id="nameInput" class="input-field" placeholder="Your Name">
             <input type="text" id="studentIDInput" class="input-field" placeholder="Your Student ID">
-            <button class="submit-button" onclick="submitDetails()">Submit</button>
+            <button id="submitBtn" class="submit-button">Submit</button>
         </div>
 
         <p id="result"></p>
@@ -34,29 +34,26 @@
         </div>
     </div>
 
-    <script type="module" src="register.js"></script>
-    
+    <!-- 🔹 Scripts -->
     <script type="module">
-    import { loadAnnouncements } from "./announcements.js";
-    document.addEventListener("DOMContentLoaded", loadAnnouncements);
-</script>
+        import { loadAnnouncements } from "./announcements.js";
+        import { loadLeaderboard } from "./leaderboard.js";
+        import { submitDetails } from "./register.js";
 
-<script type="module">
-    import { loadAnnouncements } from "./announcements.js";
-    import { loadLeaderboard } from "./leaderboard.js";
+        document.addEventListener("DOMContentLoaded", () => {
+            loadAnnouncements();
+        });
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadAnnouncements();
-    });
+        document.getElementById("submitBtn").addEventListener("click", submitDetails);
 
-    document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-        const leaderboard = document.getElementById("leaderboard");
-        leaderboard.classList.toggle("hidden");
-        if (!leaderboard.classList.contains("hidden")) {
-            loadLeaderboard();
-        }
-    });
-</script>
+        document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+            const leaderboard = document.getElementById("leaderboard");
+            leaderboard.classList.toggle("hidden");
+            if (!leaderboard.classList.contains("hidden")) {
+                loadLeaderboard();
+            }
+        });
+    </script>
 
 </body>
 </html>
