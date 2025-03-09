@@ -1,6 +1,12 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { 
+    getFirestore, 
+    collection, 
+    query, 
+    orderBy, 
+    onSnapshot 
+} from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -16,36 +22,38 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Fetch Leaderboard Data
-async function loadLeaderboard() {
+// 🔥 Real-Time Leaderboard Updates
+function loadLeaderboard() {
     const leaderboardRef = collection(db, "players");
     const q = query(leaderboardRef, orderBy("level", "desc")); // Sorting by highest level
-    const snapshot = await getDocs(q);
 
-    let leaderboardHTML = "<ol>";
-    snapshot.forEach(doc => {
-        const player = doc.data();
-        leaderboardHTML += `<li>${player.name} (Level ${player.level})</li>`;
+    onSnapshot(q, (snapshot) => {
+        let leaderboardHTML = "<ol>";
+        snapshot.forEach(doc => {
+            const player = doc.data();
+            leaderboardHTML += `<li>${player.name} (Level ${player.level})</li>`;
+        });
+        leaderboardHTML += "</ol>";
+
+        document.getElementById("leaderboard").innerHTML = leaderboardHTML;
     });
-    leaderboardHTML += "</ol>";
-
-    document.getElementById("leaderboard").innerHTML = leaderboardHTML;
 }
 
-// Fetch Announcements
-async function loadAnnouncements() {
+// 🔥 Real-Time Announcements Updates
+function loadAnnouncements() {
     const announcementsRef = collection(db, "announcements");
-    const snapshot = await getDocs(announcementsRef);
 
-    let announcementsHTML = "<ul>";
-    snapshot.forEach(doc => {
-        const announcement = doc.data();
-        announcementsHTML += `<li><strong>${announcement.title}</strong>: ${announcement.message}</li>`;
+    onSnapshot(announcementsRef, (snapshot) => {
+        let announcementsHTML = "<ul>";
+        snapshot.forEach(doc => {
+            const announcement = doc.data();
+            announcementsHTML += `<li><strong>${announcement.title}</strong>: ${announcement.message}</li>`;
+        });
+        announcementsHTML += "</ul>";
+
+        document.getElementById("announcements").innerHTML = announcementsHTML;
     });
-    announcementsHTML += "</ul>";
-
-    document.getElementById("announcements").innerHTML = announcementsHTML;
 }
 
-// Load data when page loads
+// Load real-time data when the page loads
 export { db, loadLeaderboard, loadAnnouncements };
