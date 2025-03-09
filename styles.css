@@ -29,6 +29,32 @@ body {
     border: 1px solid #ffcc00;
 }
 
+.styled-button {
+    background-color: #4a148c; /* Theme color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.styled-button:hover {
+    background-color: #7b1fa2;
+}
+
+.input-field {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #4a148c;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+}
+
+
 /* 🔹 LOGO FIX */
 .logo {
     width: 100px;  /* Adjusted for better visibility */
