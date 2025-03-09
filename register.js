@@ -26,6 +26,9 @@ async function submitDetails() {
             timestamp: new Date()
         });
         console.log("Data successfully written to Firestore!");
+        // Store Student ID in local storage
+localStorage.setItem("studentID", studentID);
+
 
         result.innerHTML = "<span class='success-text'>Registration successful! Proceeding to Level 2...</span>";
 
