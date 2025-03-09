@@ -21,19 +21,43 @@
 
         <p id="result"></p>
 
+        <!-- 🔹 Announcements Section (Auto-Updates) -->
+        <div id="announcements-section">
+            <h3>📢 Announcements</h3>
+            <p id="announcements">No announcements at the moment.</p>
+        </div>
 
-   <script type="module" src="register.js"></script>
-   <script>
-       document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-           const leaderboard = document.getElementById("leaderboard");
-           leaderboard.classList.toggle("hidden");
-       });
+        <!-- 🔹 Leaderboard Section -->
+        <div id="leaderboard-section">
+            <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
+            <div id="leaderboard" class="hidden"></div>
+        </div>
+    </div>
 
-       document.getElementById("toggleAnnouncements").addEventListener("click", () => {
-           const announcements = document.getElementById("announcements");
-           announcements.classList.toggle("hidden");
-       });
-   </script>
+    <script type="module" src="register.js"></script>
+    <script type="module">
+        import { db } from "./firebase-config.js";
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+
+        async function loadAnnouncements() {
+            const announcementsRef = collection(db, "announcements");
+            const snapshot = await getDocs(announcementsRef);
+            const announcementsElement = document.getElementById("announcements");
+
+            if (snapshot.empty) {
+                announcementsElement.textContent = "📢 No announcements at the moment.";
+            } else {
+                let announcementText = "";
+                snapshot.forEach(doc => {
+                    const announcement = doc.data();
+                    announcementText += `🔔 ${announcement.title}: ${announcement.message} \n`;
+                });
+                announcementsElement.innerHTML = announcementText;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadAnnouncements);
+    </script>
 
 </body>
 </html>
