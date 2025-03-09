@@ -7,7 +7,7 @@ export function loadAnnouncements() {
 
     const announcementsElement = document.getElementById("announcements");
 
-    // Real-time Firestore listener to update announcements automatically
+    // Live updates from Firestore
     onSnapshot(q, (snapshot) => {
         if (snapshot.empty) {
             announcementsElement.textContent = "📢 No announcements at the moment.";
