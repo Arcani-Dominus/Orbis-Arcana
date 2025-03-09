@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbis Arcana - Level</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
+        <h1 class="title">Orbis Arcana</h1>
+        <h2 id="level-title"></h2>
+
+        <p id="riddle" class="riddle"></p>
+        
+        <input type="text" id="answerInput" placeholder="Enter your answer" class="input-field">
+        <button id="submitAnswer" class="submit-button">Submit</button>
+        <p id="feedback"></p>
+
+        <!-- 📢 Announcements Section -->
+        <div id="announcements-section">
+            <h3>📢 Announcements</h3>
+            <p id="announcements">Loading announcements...</p>
+        </div>
+
+        <!-- 🏆 Leaderboard Section -->
+        <div id="leaderboard-section">
+            <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
+            <div id="leaderboard" class="hidden"></div>
+        </div>
+    </div>
+
+    <script src="levels.js"></script>
+    <script src="announcements.js"></script>
+    <script src="leaderboard.js"></script>
+</body>
+</html>
