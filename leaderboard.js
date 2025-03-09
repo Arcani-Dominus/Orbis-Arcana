@@ -12,9 +12,9 @@ export async function loadLeaderboard() {
         leaderboardElement.innerHTML = "<p>No players yet.</p>";
     } else {
         let leaderboardHTML = "<ol>";
-        snapshot.forEach(doc => {
+        snapshot.forEach((doc, index) => {
             const player = doc.data();
-            leaderboardHTML += `<li>${player.name} (Level ${player.level})</li>`;
+            leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
         });
         leaderboardHTML += "</ol>";
 
