@@ -103,24 +103,7 @@
             }
         });
 
-        <script type="module">
-    import { loadAnnouncements } from "./announcements.js";
-    import { loadLeaderboard } from "./leaderboard.js";
-
-    document.addEventListener("DOMContentLoaded", () => {
-        loadAnnouncements();
-    });
-
-    document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-        const leaderboard = document.getElementById("leaderboard");
-        leaderboard.classList.toggle("hidden");
-        if (!leaderboard.classList.contains("hidden")) {
-            loadLeaderboard();
-        }
-    });
-</script>
-
-
     </script>
+
 </body>
 </html>
