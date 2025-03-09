@@ -21,12 +21,21 @@
 
         <p id="result"></p>
 
-    
+        <!-- 📢 Announcements -->
+        <div id="announcements-section">
+            <h3>📢 Announcements</h3>
+            <p id="announcements">No announcements at the moment.</p>
+        </div>
+    </div>
 
+    <!-- ✅ Load Firebase & Register Script -->
     <script type="module" src="register.js"></script>
 
     <script>
-        document.getElementById("submitBtn").addEventListener("click", submitDetails);
+        // ✅ Attach event listener when page loads
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("submitBtn").addEventListener("click", submitDetails);
+        });
     </script>
 
 </body>
