@@ -8,30 +8,26 @@
 </head>
 <body>
     <div id="container">
-        <img src="logo.png" alt="Orbis Arcana Logo" class="logo">
+        <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
         <h1 class="title">Orbis Arcana</h1>
-        <h2>Registration</h2>
 
-        <p><strong>Enter your details to proceed:</strong></p>
-
-        <input type="text" id="nameInput" placeholder="Your Name">
-        <input type="text" id="studentIDInput" placeholder="Your Student ID">
-        <button onclick="submitDetails()">Submit</button>
+        <!-- 🔹 Input Fields -->
+        <div class="input-container">
+            <input type="text" id="nameInput" placeholder="Your Name">
+            <input type="text" id="studentIDInput" placeholder="Your Student ID">
+            <button class="submit-button" onclick="submitDetails()">Submit</button>
+        </div>
 
         <p id="result"></p>
 
-        <!-- Announcements Section -->
-        <div id="announcements-section">
-            <h2>📢 Announcements</h2>
-            <div id="announcements">Loading announcements...</div>
+        <!-- 🔹 Announcements (Hidden unless an update exists) -->
+        <div id="announcements-section" class="hidden">
+            <div id="announcements"></div>
         </div>
 
-        <!-- Leaderboard Section -->
-        <div id="leaderboard-section">
-            <h2>🏆 Leaderboard</h2>
-            <button id="loadLeaderboardBtn">Show Leaderboard</button>
-            <div id="leaderboard" style="display: none;"></div>
-        </div>
+        <!-- 🔹 Leaderboard Button -->
+        <button id="loadLeaderboardBtn" class="toggle-button">Show Leaderboard</button>
+        <div id="leaderboard" class="hidden"></div>
     </div>
 
     <script type="module">
@@ -43,11 +39,9 @@
 
             document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
                 const leaderboard = document.getElementById("leaderboard");
-                if (leaderboard.style.display === "none") {
-                    loadLeaderboard(); // Load leaderboard when clicked
-                    leaderboard.style.display = "block";
-                } else {
-                    leaderboard.style.display = "none";
+                leaderboard.classList.toggle("hidden");
+                if (!leaderboard.classList.contains("hidden")) {
+                    loadLeaderboard(); // Load leaderboard when visible
                 }
             });
         });
