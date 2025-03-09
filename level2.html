@@ -9,102 +9,85 @@
 <body>
     <div id="container">
         <img src="logo.png" alt="Orbis Arcana Logo" class="logo">
-        <h1 class="title">ORBIS ARCANA</h1>
-        <h2 class="subtitle">Level 2</h2>
+        <h1 class="title">Orbis Arcana</h1>
+        <h2>Level 2</h2>
 
-        <p><strong>Riddle:</strong> The more you take, the more you leave behind. What am I?</p>
-
+        <p class="riddle">❓ The more you take, the more you leave behind. What am I?</p>
+        
         <input type="text" id="answerInput" placeholder="Enter your answer">
-        <button class="glow" onclick="checkAnswer()">Submit</button>
-
-        <p id="result"></p>
-
-        <a id="nextLevelLink" href="level3.html" style="display: none;">Proceed to Next Level</a>
-
-        <!-- Leaderboard Section -->
-        <div class="section-container">
-            <h3 class="section-title" onclick="toggleSection('leaderboard')">Leaderboard</h3>
-            <div id="leaderboard" class="section-content"></div>
-        </div>
+        <button id="submitAnswer">Submit</button>
+        <p id="feedback"></p>
 
         <!-- Announcements Section -->
-        <div class="section-container">
-            <h3 class="section-title" onclick="toggleSection('announcements')">Announcements</h3>
-            <div id="announcements" class="section-content"></div>
+        <div id="announcements-section">
+            <h2>📢 Announcements</h2>
+            <div id="announcements">Loading announcements...</div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div id="leaderboard-section">
+            <h2>🏆 Leaderboard</h2>
+            <button id="loadLeaderboardBtn">Show Leaderboard</button>
+            <div id="leaderboard" style="display: none;"></div>
         </div>
     </div>
 
     <script type="module">
-        import { db } from "./firebase-config.js";
-        import { getFirestore, doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { db, loadLeaderboard, loadAnnouncements } from "./firebase-config.js";
+        import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-        const correctAnswer = "footsteps"; 
+        document.addEventListener("DOMContentLoaded", async () => {
+            loadAnnouncements(); // Auto-load announcements
 
-        async function checkAnswer() {
-            const userAnswer = document.getElementById("answerInput").value.trim().toLowerCase();
-            const result = document.getElementById("result");
-            const nextLevelLink = document.getElementById("nextLevelLink");
-            const studentID = localStorage.getItem("studentID");
-
-            if (userAnswer === correctAnswer) {
-                result.innerHTML = "<span class='correct'>Correct! 🎉</span>";
-                nextLevelLink.style.display = "block";
-
-                if (studentID) {
-                    await setDoc(doc(db, "players", studentID), { level: 3 }, { merge: true });
-                    localStorage.setItem("currentLevel", 3);
+            document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+                const leaderboard = document.getElementById("leaderboard");
+                if (leaderboard.style.display === "none") {
+                    loadLeaderboard();
+                    leaderboard.style.display = "block";
+                } else {
+                    leaderboard.style.display = "none";
                 }
-            } else {
-                result.innerHTML = "<span class='incorrect'>Incorrect! Try again.</span>";
-            }
-        }
-
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            section.style.display = section.style.display === "none" || section.style.display === "" ? "block" : "none";
-        }
-
-        async function loadLeaderboard() {
-            const leaderboardDiv = document.getElementById("leaderboard");
-            const querySnapshot = await getDocs(collection(db, "players"));
-            let leaderboardHTML = "<ul>";
-            querySnapshot.forEach(doc => {
-                const player = doc.data();
-                leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
             });
-            leaderboardHTML += "</ul>";
-            leaderboardDiv.innerHTML = leaderboardHTML;
-        }
 
-        async function loadAnnouncements() {
-            const announcementsDiv = document.getElementById("announcements");
-            const querySnapshot = await getDocs(collection(db, "announcements"));
-            let announcementsHTML = "<ul>";
-            querySnapshot.forEach(doc => {
-                const announcement = doc.data();
-                announcementsHTML += `<li>${announcement.message} - <em>${announcement.timestamp.toDate().toLocaleString()}</em></li>`;
-            });
-            announcementsHTML += "</ul>";
-            announcementsDiv.innerHTML = announcementsHTML;
-        }
-
-        async function restoreProgress() {
+            // Check if player has already completed level 2
             const studentID = localStorage.getItem("studentID");
-            const currentLevel = localStorage.getItem("currentLevel");
-            if (studentID && currentLevel >= 2) {
+            if (!studentID) {
+                alert("You need to register first!");
+                window.location.href = "registration.html";
+            }
+
+            const playerRef = doc(db, "players", studentID);
+            const playerSnap = await getDoc(playerRef);
+            if (playerSnap.exists() && playerSnap.data().level > 2) {
+                document.getElementById("feedback").innerHTML = "<span class='success-text'>You already completed this level!</span>";
+                document.getElementById("submitAnswer").disabled = true;
+            }
+        });
+
+        document.getElementById("submitAnswer").addEventListener("click", async () => {
+            const answer = document.getElementById("answerInput").value.trim().toLowerCase();
+            const feedback = document.getElementById("feedback");
+            const studentID = localStorage.getItem("studentID");
+
+            if (!studentID) {
+                alert("You need to register first!");
+                window.location.href = "registration.html";
+                return;
+            }
+
+            if (answer === "footsteps") {
+                feedback.innerHTML = "<span class='glowing-text'>✅ Correct!</span>";
+                document.getElementById("submitAnswer").disabled = true;
+
+                // Update player level
                 const playerRef = doc(db, "players", studentID);
-                const playerSnap = await getDoc(playerRef);
-                if (playerSnap.exists()) {
-                    if (playerSnap.data().level > 2) {
-                        window.location.href = `level${playerSnap.data().level}.html`;
-                    }
-                }
-            }
-        }
+                await updateDoc(playerRef, { level: 3 });
 
-        loadLeaderboard();
-        loadAnnouncements();
-        restoreProgress();
+                setTimeout(() => window.location.href = "level3.html", 2000);
+            } else {
+                feedback.innerHTML = "<span class='error-text'>❌ Incorrect, try again!</span>";
+            }
+        });
     </script>
 </body>
 </html>
