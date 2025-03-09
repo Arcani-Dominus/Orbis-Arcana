@@ -25,11 +25,23 @@
         </div>
 
         <!-- 🏆 Leaderboard Section -->
-        <div id="leaderboard-section">
-            <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
-            <div id="leaderboard" class="hidden"></div>
-        </div>
-    </div>
+<div id="leaderboard-section">
+    <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
+    <div id="leaderboard" class="hidden"></div>
+</div>
+
+<script type="module">
+    import { loadLeaderboard } from "./leaderboard.js";
+
+    document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+        const leaderboard = document.getElementById("leaderboard");
+        leaderboard.classList.toggle("hidden");
+        if (!leaderboard.classList.contains("hidden")) {
+            loadLeaderboard();
+        }
+    });
+</script>
+
 
     <script src="levels.js"></script>
     <script src="announcements.js"></script>
