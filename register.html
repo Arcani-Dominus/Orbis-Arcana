@@ -24,26 +24,14 @@
         <div id="announcements-section" class="hidden">
             <div id="announcements"></div>
         </div>
-
-        <!-- 🔹 Leaderboard Button -->
-        <button id="loadLeaderboardBtn" class="toggle-button">Show Leaderboard</button>
-        <div id="leaderboard" class="hidden"></div>
     </div>
 
     <script type="module">
-        import { db, loadLeaderboard, loadAnnouncements } from "./firebase-config.js";
+        import { db, loadAnnouncements } from "./firebase-config.js";
         import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
         document.addEventListener("DOMContentLoaded", () => {
             loadAnnouncements(); // Auto-load announcements
-
-            document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-                const leaderboard = document.getElementById("leaderboard");
-                leaderboard.classList.toggle("hidden");
-                if (!leaderboard.classList.contains("hidden")) {
-                    loadLeaderboard(); // Load leaderboard when visible
-                }
-            });
         });
 
         async function submitDetails() {
