@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             const announcementsElement = document.getElementById("announcements");
+
             if (data.length === 0) {
                 announcementsElement.innerHTML = "📢 No announcements at the moment.";
             } else {
