@@ -34,6 +34,7 @@
     <script type="module">
         import { db, loadLeaderboard } from "./firebase-config.js";
         import { getDoc, doc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { loadAnnouncements } from "./announcements.js";
 
         const correctAnswer = "footsteps"; // Correct answer for Level 2
 
@@ -87,12 +88,6 @@
             }
         }
 
-        <script type="module">
-    import { loadAnnouncements } from "./announcements.js";
-    document.addEventListener("DOMContentLoaded", loadAnnouncements);
-</script>
-
-
         document.addEventListener("DOMContentLoaded", () => {
             checkRegistration();
             loadAnnouncements();
@@ -102,11 +97,9 @@
 
         document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
             const leaderboard = document.getElementById("leaderboard");
-            if (leaderboard.style.display === "none") {
+            leaderboard.classList.toggle("hidden");
+            if (!leaderboard.classList.contains("hidden")) {
                 loadLeaderboard();
-                leaderboard.style.display = "block";
-            } else {
-                leaderboard.style.display = "none";
             }
         });
 
