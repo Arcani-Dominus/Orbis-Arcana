@@ -18,13 +18,13 @@
         <button id="submitAnswer" class="submit-button">Submit</button>
         <p id="feedback"></p>
 
-        <!-- Announcements Section -->
+        <!-- 🔹 Announcements Section (Auto-Updates) -->
         <div id="announcements-section">
-            <button id="toggleAnnouncements" class="toggle-button">📢 Announcements</button>
-            <div id="announcements" class="hidden">Loading announcements...</div>
+            <h3>📢 Announcements</h3>
+            <p id="announcements">No announcements at the moment.</p>
         </div>
 
-        <!-- Leaderboard Section -->
+        <!-- 🔹 Leaderboard Section -->
         <div id="leaderboard-section">
             <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
             <div id="leaderboard" class="hidden"></div>
@@ -33,7 +33,7 @@
 
     <script type="module">
         import { db, loadLeaderboard } from "./firebase-config.js";
-        import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { getDoc, doc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
         const correctAnswer = "footsteps"; // Correct answer for Level 2
 
@@ -87,10 +87,30 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", checkRegistration);
+        async function loadAnnouncements() {
+            const announcementsRef = collection(db, "announcements");
+            const snapshot = await getDocs(announcementsRef);
+            const announcementsElement = document.getElementById("announcements");
+
+            if (snapshot.empty) {
+                announcementsElement.textContent = "📢 No announcements at the moment.";
+            } else {
+                let announcementText = "";
+                snapshot.forEach(doc => {
+                    const announcement = doc.data();
+                    announcementText += `🔔 ${announcement.title}: ${announcement.message} \n`;
+                });
+                announcementsElement.innerHTML = announcementText;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkRegistration();
+            loadAnnouncements();
+        });
+
         document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
 
-        // Leaderboard functionality
         document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
             const leaderboard = document.getElementById("leaderboard");
             if (leaderboard.style.display === "none") {
@@ -101,11 +121,6 @@
             }
         });
 
-        // Toggle announcements
-        document.getElementById("toggleAnnouncements").addEventListener("click", () => {
-            const announcements = document.getElementById("announcements");
-            announcements.classList.toggle("hidden");
-        });
     </script>
 </body>
 </html>
