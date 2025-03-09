@@ -6,27 +6,25 @@ document.addEventListener("DOMContentLoaded", () => {
         4: { riddle: "The more you remove from me, the bigger I get. What am I?", answer: "hole" }
     };
 
-    // Get current level from URL (e.g., level.html?level=2)
+    // Get the current level from URL or saved progress
     const urlParams = new URLSearchParams(window.location.search);
-    const level = urlParams.get("level") || 1;
+    let level = parseInt(urlParams.get("level")) || parseInt(localStorage.getItem("playerLevel")) || 1;
 
-    // Set riddle and title
+    if (!levelData[level]) level = 1; // Reset if level doesn't exist
+
     document.getElementById("level-title").innerText = `Level ${level}`;
     document.getElementById("riddle").innerText = levelData[level].riddle;
 
-    // Submit Answer Function
     document.getElementById("submitAnswer").addEventListener("click", () => {
         const answer = document.getElementById("answerInput").value.trim().toLowerCase();
         const feedback = document.getElementById("feedback");
 
         if (answer === levelData[level].answer) {
             feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to the next level...</span>";
-            
-            // Save player progress
-            localStorage.setItem("playerLevel", parseInt(level) + 1);
+            localStorage.setItem("playerLevel", level + 1);
 
             setTimeout(() => {
-                window.location.href = `level.html?level=${parseInt(level) + 1}`;
+                window.location.href = `level.html?level=${level + 1}`;
             }, 2000);
         } else {
             feedback.innerHTML = "<span style='color: red;'>Wrong answer! Try again.</span>";
