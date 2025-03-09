@@ -22,21 +22,21 @@ async function submitDetails() {
         await setDoc(doc(db, "players", studentID), {
             name: name,
             studentID: studentID,
-            level: 1, // Players start at Level 1
+            level: 2, // Players start at Level 2
             timestamp: new Date()
         });
         console.log("✅ Data successfully saved!");
 
-        // 🔹 Store Student ID in local storage for later use
+        // 🔹 Store Player Data in Local Storage
         localStorage.setItem("studentID", studentID);
         localStorage.setItem("playerName", name);
-        localStorage.setItem("playerLevel", 1);
+        localStorage.setItem("playerLevel", 2); // Start at Level 2
 
-        result.innerHTML = "<span class='success-text'>Registration successful! Redirecting to Level 1...</span>";
+        result.innerHTML = "<span class='success-text'>Registration successful! Redirecting to Level 2...</span>";
 
         setTimeout(() => {
-            console.log("🔄 Redirecting to Level 1...");
-            window.location.href = "level.html?level=1";
+            console.log("🔄 Redirecting to Level 2...");
+            window.location.href = "level.html?level=2"; // ✅ Redirect to Level 2
         }, 2000);
     } catch (error) {
         console.error("❌ Error writing to Firestore:", error);
@@ -44,5 +44,5 @@ async function submitDetails() {
     }
 }
 
-// ✅ Ensure function is globally available
+// ✅ Make function globally available
 window.submitDetails = submitDetails;
