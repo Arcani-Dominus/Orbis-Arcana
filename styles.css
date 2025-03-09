@@ -29,24 +29,26 @@ body {
     border: 1px solid #ffcc00;
 }
 
-/* 🔥 GOLDEN THEME BUTTONS */
+/* 🔥 BUTTON STYLES (Matches Register Page) */
 .styled-button, .submit-button, .toggle-button {
-    background-color: #222;
+    background: #222;
     color: #ffcc00;
     border: 1px solid #ffcc00;
-    padding: 10px 20px;
+    padding: 10px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 8px;
     transition: all 0.3s ease-in-out;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .styled-button:hover, .submit-button:hover, .toggle-button:hover {
-    background-color: #ffcc00;
+    background: #ffcc00;
     color: black;
 }
 
-/* 🔹 INPUT FIELD */
+/* 🔹 INPUT FIELDS */
 .input-field {
     width: 80%;
     padding: 10px;
@@ -54,14 +56,14 @@ body {
     border: 2px solid #ffcc00;
     border-radius: 8px;
     font-size: 16px;
-    text-align: center;
     background: rgba(30, 30, 30, 0.9);
     color: #ffcc00;
+    text-align: center;
 }
 
 /* 🔹 LOGO */
 .logo {
-    width: 100px;  
+    width: 100px;
     margin: 0 auto 15px auto;
     display: block;
     filter: drop-shadow(0px 0px 10px rgba(255, 204, 0, 0.8));
@@ -75,13 +77,8 @@ body {
     margin-bottom: 15px;
 }
 
-/* 🔹 HIDE ANNOUNCEMENTS & LEADERBOARD INITIALLY */
-.hidden {
-    display: none;
-}
-
-/* 🔹 LEADERBOARD */
-#leaderboard {
+/* 🔹 LEADERBOARD & ANNOUNCEMENTS */
+#leaderboard, #announcements {
     margin-top: 15px;
     background: rgba(0, 0, 0, 0.8);
     padding: 12px;
@@ -101,13 +98,7 @@ body {
     padding: 5px 0;
 }
 
-/* 🔹 ANNOUNCEMENTS */
-#announcements {
-    margin-top: 15px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
+/* 🔹 HIDE ANNOUNCEMENTS & LEADERBOARD INITIALLY */
+.hidden {
     display: none;
-    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
 }
