@@ -35,29 +35,12 @@
     </div>
 
     <script type="module" src="register.js"></script>
+    
     <script type="module">
-        import { db } from "./firebase-config.js";
-        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+    import { loadAnnouncements } from "./announcements.js";
+    document.addEventListener("DOMContentLoaded", loadAnnouncements);
+</script>
 
-        async function loadAnnouncements() {
-            const announcementsRef = collection(db, "announcements");
-            const snapshot = await getDocs(announcementsRef);
-            const announcementsElement = document.getElementById("announcements");
-
-            if (snapshot.empty) {
-                announcementsElement.textContent = "📢 No announcements at the moment.";
-            } else {
-                let announcementText = "";
-                snapshot.forEach(doc => {
-                    const announcement = doc.data();
-                    announcementText += `🔔 ${announcement.title}: ${announcement.message} \n`;
-                });
-                announcementsElement.innerHTML = announcementText;
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", loadAnnouncements);
-    </script>
 
 </body>
 </html>
