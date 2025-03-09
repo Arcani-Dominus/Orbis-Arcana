@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="container">
-        <img src="logo.png" alt="Orbis Arcana Logo" class="logo">
+        <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
         <h1 class="title">Orbis Arcana</h1>
         <h2>Level 2</h2>
 
@@ -19,75 +19,70 @@
         <p id="feedback"></p>
 
         <!-- Announcements Section -->
-        <div id="announcements-section">
+        <div id="announcements-section" style="display: none;">
             <h2>📢 Announcements</h2>
             <div id="announcements">Loading announcements...</div>
-        </div>
-
-        <!-- Leaderboard Section -->
-        <div id="leaderboard-section">
-            <h2>🏆 Leaderboard</h2>
-            <button id="loadLeaderboardBtn">Show Leaderboard</button>
-            <div id="leaderboard" style="display: none;"></div>
         </div>
     </div>
 
     <script type="module">
-        import { db, loadLeaderboard, loadAnnouncements } from "./firebase-config.js";
-        import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { db, loadAnnouncements } from "./firebase-config.js";
+        import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-        document.addEventListener("DOMContentLoaded", async () => {
-            loadAnnouncements(); // Auto-load announcements
-
-            document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-                const leaderboard = document.getElementById("leaderboard");
-                if (leaderboard.style.display === "none") {
-                    loadLeaderboard();
-                    leaderboard.style.display = "block";
-                } else {
-                    leaderboard.style.display = "none";
-                }
-            });
-
-            // Check if player has already completed level 2
+        // Registration check
+        async function checkRegistration() {
             const studentID = localStorage.getItem("studentID");
-            if (!studentID) {
-                alert("You need to register first!");
-                window.location.href = "registration.html";
-            }
-
-            const playerRef = doc(db, "players", studentID);
-            const playerSnap = await getDoc(playerRef);
-            if (playerSnap.exists() && playerSnap.data().level > 2) {
-                document.getElementById("feedback").innerHTML = "<span class='success-text'>You already completed this level!</span>";
-                document.getElementById("submitAnswer").disabled = true;
-            }
-        });
-
-        document.getElementById("submitAnswer").addEventListener("click", async () => {
-            const answer = document.getElementById("answerInput").value.trim().toLowerCase();
-            const feedback = document.getElementById("feedback");
-            const studentID = localStorage.getItem("studentID");
+            console.log("Checking registration for:", studentID);
 
             if (!studentID) {
-                alert("You need to register first!");
-                window.location.href = "registration.html";
+                console.error("No Student ID found in local storage!");
+                window.location.href = "error.html";
                 return;
             }
 
-            if (answer === "footsteps") {
-                feedback.innerHTML = "<span class='glowing-text'>✅ Correct!</span>";
-                document.getElementById("submitAnswer").disabled = true;
-
-                // Update player level
+            try {
                 const playerRef = doc(db, "players", studentID);
-                await updateDoc(playerRef, { level: 3 });
+                const playerSnap = await getDoc(playerRef);
 
+                if (!playerSnap.exists()) {
+                    console.error("No player data found in Firestore!");
+                    window.location.href = "error.html";
+                } else {
+                    console.log("Player found:", playerSnap.data());
+                }
+            } catch (error) {
+                console.error("Error checking registration:", error);
+                window.location.href = "error.html";
+            }
+        }
+
+        // Answer Submission
+        document.getElementById("submitAnswer").addEventListener("click", () => {
+            const answer = document.getElementById("answerInput").value.trim().toLowerCase();
+            const feedback = document.getElementById("feedback");
+
+            if (answer === "footsteps") {
+                feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to Level 3...</span>";
                 setTimeout(() => window.location.href = "level3.html", 2000);
             } else {
-                feedback.innerHTML = "<span class='error-text'>❌ Incorrect, try again!</span>";
+                feedback.innerHTML = "<span class='error-text'>Incorrect, try again.</span>";
             }
         });
+
+        // Load Announcements
+        async function displayAnnouncements() {
+            await loadAnnouncements();
+            const announcements = document.getElementById("announcements").innerHTML;
+            if (announcements.trim() !== "Loading announcements...") {
+                document.getElementById("announcements-section").style.display = "block";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            checkRegistration();
+            displayAnnouncements();
+        });
     </script>
+
 </body>
 </html>
