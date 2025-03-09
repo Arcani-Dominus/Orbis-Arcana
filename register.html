@@ -21,19 +21,9 @@
 
         <p id="result"></p>
 
-        <!-- 📢 Announcements -->
-        <div id="announcements-section">
-            <h3>📢 Announcements</h3>
-            <p id="announcements">No announcements at the moment.</p>
-        </div>
-    </div>
+    
 
     <script type="module" src="register.js"></script>
-
-    <script type="module">
-        import { loadAnnouncements } from "./announcements.js";
-        document.addEventListener("DOMContentLoaded", loadAnnouncements);
-    </script>
 
     <script>
         document.getElementById("submitBtn").addEventListener("click", submitDetails);
