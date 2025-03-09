@@ -1,46 +1,48 @@
 import { db } from "./firebase-config.js";
-import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 async function submitDetails() {
-    console.log("Submit button clicked!");
+    console.log("✅ Submit button clicked!");
 
     const name = document.getElementById("nameInput").value.trim();
     const studentID = document.getElementById("studentIDInput").value.trim();
     const result = document.getElementById("result");
 
-    console.log("Name entered:", name);
-    console.log("Student ID entered:", studentID);
+    console.log("📌 Name entered:", name);
+    console.log("📌 Student ID entered:", studentID);
 
     if (!name || !studentID) {
-        console.log("Missing details!");
+        console.warn("❌ Missing details!");
         result.innerHTML = "<span style='color: red;'>Please enter all details.</span>";
         return;
     }
 
     try {
-        console.log("Attempting to write to Firestore...");
+        console.log("⏳ Saving player data to Firestore...");
         await setDoc(doc(db, "players", studentID), {
             name: name,
             studentID: studentID,
-            level: 2,
+            level: 1, // Players start at Level 1
             timestamp: new Date()
         });
-        console.log("Data successfully written to Firestore!");
+        console.log("✅ Data successfully saved!");
 
-        result.innerHTML = "<span class='success-text'>Registration successful! Proceeding to Level 2...</span>";
-
-        // Store Student ID in local storage
+        // 🔹 Store Student ID in local storage for later use
         localStorage.setItem("studentID", studentID);
+        localStorage.setItem("playerName", name);
+        localStorage.setItem("playerLevel", 1);
+
+        result.innerHTML = "<span class='success-text'>Registration successful! Redirecting to Level 1...</span>";
 
         setTimeout(() => {
-            console.log("Redirecting to Level 2...");
-            window.location.href = "level2.html";
+            console.log("🔄 Redirecting to Level 1...");
+            window.location.href = "level.html?level=1";
         }, 2000);
     } catch (error) {
-        console.error("Error writing to Firestore:", error);
+        console.error("❌ Error writing to Firestore:", error);
         result.innerHTML = "<span style='color: red;'>Error submitting details. Check console.</span>";
     }
 }
 
-// ✅ Fix: Ensure submitDetails is exported
-export { submitDetails };
+// ✅ Ensure function is globally available
+window.submitDetails = submitDetails;
