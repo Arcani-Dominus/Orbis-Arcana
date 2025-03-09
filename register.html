@@ -10,23 +10,41 @@
     <div id="container">
         <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
         <h1 class="title">Orbis Arcana</h1>
+        <h2>Register to Begin</h2>
 
         <!-- 🔹 Input Fields -->
         <div class="input-container">
-            <input type="text" id="nameInput" placeholder="Your Name">
-            <input type="text" id="studentIDInput" placeholder="Your Student ID">
+            <input type="text" id="nameInput" class="input-field" placeholder="Your Name">
+            <input type="text" id="studentIDInput" class="input-field" placeholder="Your Student ID">
             <button class="submit-button" onclick="submitDetails()">Submit</button>
         </div>
 
         <p id="result"></p>
 
-        <!-- 🔹 Announcements (Hidden unless an update exists) -->
-        <div id="announcements-section" class="hidden">
-            <div id="announcements"></div>
+        <!-- 🔹 Announcements Section -->
+        <div id="announcements-section">
+            <button id="toggleAnnouncements" class="toggle-button">📢 Announcements</button>
+            <div id="announcements" class="hidden">Loading announcements...</div>
+        </div>
+
+        <!-- 🔹 Leaderboard Section -->
+        <div id="leaderboard-section">
+            <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
+            <div id="leaderboard" class="hidden"></div>
         </div>
     </div>
 
-   <script type="module" src="register.js"> 
+   <script type="module" src="register.js"></script>
+   <script>
+       document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+           const leaderboard = document.getElementById("leaderboard");
+           leaderboard.classList.toggle("hidden");
+       });
+
+       document.getElementById("toggleAnnouncements").addEventListener("click", () => {
+           const announcements = document.getElementById("announcements");
+           announcements.classList.toggle("hidden");
+       });
    </script>
 
 </body>
