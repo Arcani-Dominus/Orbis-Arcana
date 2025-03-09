@@ -32,9 +32,10 @@
     </div>
 
     <script type="module">
-        import { db, loadLeaderboard } from "./firebase-config.js";
-        import { getDoc, doc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { db } from "./firebase-config.js";
+        import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
         import { loadAnnouncements } from "./announcements.js";
+        import { loadLeaderboard } from "./leaderboard.js";
 
         const correctAnswer = "footsteps"; // Correct answer for Level 2
 
@@ -102,7 +103,6 @@
                 loadLeaderboard();
             }
         });
-
     </script>
 
 </body>
