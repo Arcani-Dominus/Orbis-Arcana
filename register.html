@@ -4,36 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orbis Arcana - Register</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: url('charlesdeluvio-pcZvxrAyYoQ-unsplash.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: #e0e0e0;
-            text-align: center;
-            font-family: 'Cinzel', serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            padding: 10px;
-        }
-        #container {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 75%;
-            min-width: 280px;
-        }
-        .title { color: #ffcc00; font-size: 28px; font-weight: bold; }
-        input, button { margin-top: 10px; padding: 8px; font-size: 14px; width: 80%; }
-        button { background: #222; color: #ffcc00; border: 2px solid #ffcc00; cursor: pointer; }
-        button:hover { background: #ffcc00; color: black; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="container">
+        <img src="logo.png" alt="Orbis Arcana Logo" class="logo">
         <h1 class="title">Orbis Arcana</h1>
         <h2>Registration</h2>
 
@@ -41,16 +16,75 @@
 
         <input type="text" id="nameInput" placeholder="Your Name">
         <input type="text" id="studentIDInput" placeholder="Your Student ID">
-        <button id="submitBtn">Submit</button>
+        <button onclick="submitDetails()">Submit</button>
 
         <p id="result"></p>
+
+        <!-- Announcements Section -->
+        <div id="announcements-section">
+            <h2>📢 Announcements</h2>
+            <div id="announcements">Loading announcements...</div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div id="leaderboard-section">
+            <h2>🏆 Leaderboard</h2>
+            <button id="loadLeaderboardBtn">Show Leaderboard</button>
+            <div id="leaderboard" style="display: none;"></div>
+        </div>
     </div>
 
-    <!-- Load Firebase Config -->
     <script type="module">
-        import { submitDetails } from "./firebase-config.js";
+        import { db, loadLeaderboard, loadAnnouncements } from "./firebase-config.js";
+        import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-        document.getElementById("submitBtn").addEventListener("click", submitDetails);
+        document.addEventListener("DOMContentLoaded", () => {
+            loadAnnouncements(); // Auto-load announcements
+
+            document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+                const leaderboard = document.getElementById("leaderboard");
+                if (leaderboard.style.display === "none") {
+                    loadLeaderboard(); // Load leaderboard when clicked
+                    leaderboard.style.display = "block";
+                } else {
+                    leaderboard.style.display = "none";
+                }
+            });
+        });
+
+        async function submitDetails() {
+            console.log("Submit button clicked!");
+
+            const name = document.getElementById("nameInput").value.trim();
+            const studentID = document.getElementById("studentIDInput").value.trim();
+            const result = document.getElementById("result");
+
+            console.log("Name entered:", name);
+            console.log("Student ID entered:", studentID);
+
+            if (!name || !studentID) {
+                console.log("Missing details!");
+                result.innerHTML = "<span style='color: red;'>Please enter all details.</span>";
+                return;
+            }
+
+            try {
+                console.log("Attempting to write to Firestore...");
+                await setDoc(doc(db, "players", studentID), {
+                    name: name,
+                    studentID: studentID,
+                    level: 2,
+                    timestamp: new Date()
+                });
+                console.log("Data successfully written to Firestore!");
+
+                result.innerHTML = "<span class='success-text'>Registration successful! Proceeding to Level 2...</span>";
+                setTimeout(() => window.location.href = "level2.html", 2000);
+            } catch (error) {
+                console.error("Error writing to Firestore:", error);
+                result.innerHTML = "<span style='color: red;'>Error submitting details. Check console.</span>";
+            }
+        }
     </script>
 </body>
 </html>
