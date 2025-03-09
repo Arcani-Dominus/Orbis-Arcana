@@ -16,109 +16,123 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
+    flex-direction: column;
     padding: 10px;
 }
 
+/* 🔹 Container Styling */
 #container {
     background: rgba(0, 0, 0, 0.6);
     padding: 20px;
     border-radius: 10px;
     max-width: 80%;
     min-width: 300px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
 }
 
+/* 🔹 Logo */
 .logo {
-    max-width: 100px;
+    width: 120px;  /* Made smaller */
     margin-bottom: 10px;
 }
 
+/* 🔹 Title */
 .title {
     color: #ffcc00;
-    font-size: 32px;
+    font-size: 28px;
     font-weight: bold;
 }
 
-.subtitle {
-    color: #e0e0e0;
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
+/* 🔹 Input Fields */
 input {
-    width: 80%;
+    margin-top: 10px;
     padding: 10px;
-    margin: 10px 0;
-    border: 2px solid #ffcc00;
-    border-radius: 5px;
-    background: #222;
-    color: #e0e0e0;
     font-size: 16px;
-    text-align: center;
+    width: 80%;
+    border-radius: 5px;
+    border: 1px solid #ffcc00;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
 }
 
-button {
-    padding: 10px;
+/* 🔹 Subtle Answer Button */
+.answer-button {
+    margin-top: 10px;
+    padding: 12px;
     font-size: 16px;
-    background: #222;
+    width: 80%;
+    background: rgba(255, 255, 255, 0.2);  /* Slightly muted white */
     color: #ffcc00;
     border: 2px solid #ffcc00;
-    border-radius: 5px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease-in-out;
 }
 
-button:hover {
+.answer-button:hover {
     background: #ffcc00;
     color: black;
 }
 
-button.glow {
-    animation: glow 1.5s infinite alternate;
-}
-
-@keyframes glow {
-    from {
-        box-shadow: 0 0 5px #ffcc00;
-    }
-    to {
-        box-shadow: 0 0 15px #ffcc00;
-    }
-}
-
-.correct {
-    color: #66ff66;
-    font-weight: bold;
-    text-shadow: 0 0 10px #66ff66;
-}
-
-.incorrect {
-    color: #ff6666;
-    font-weight: bold;
-}
-
-.section-container {
-    margin-top: 20px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-}
-
-.section-title {
-    cursor: pointer;
+/* 🔹 Glowing Submit Button */
+.submit-button {
+    margin-top: 10px;
+    padding: 12px;
+    font-size: 16px;
+    width: 80%;
+    background: #222;
     color: #ffcc00;
-    font-size: 18px;
-    text-decoration: underline;
-    transition: 0.3s;
+    border: 2px solid #ffcc00;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 0 10px #ffcc00;
 }
 
-.section-title:hover {
-    color: #fff;
+.submit-button:hover {
+    background: #ffcc00;
+    color: black;
+    box-shadow: 0 0 20px #ffcc00;
 }
 
-.section-content {
-    display: none;
-    padding: 10px;
+/* 🔹 Glowing 'Correct!' Text */
+.correct-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #66ffcc;
+    text-shadow: 0 0 10px #66ffcc;
+}
+
+/* 🔹 Leaderboard & Announcements Styling */
+#leaderboard, #announcements {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 400px;
     text-align: left;
+}
+
+#leaderboard h3, #announcements h3 {
+    color: #ffcc00;
+    text-align: center;
+}
+
+/* 🔹 Toggle Button for Leaderboard */
+.toggle-button {
+    margin-top: 15px;
+    padding: 8px 12px;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffcc00;
+    border: 2px solid #ffcc00;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.toggle-button:hover {
+    background: #ffcc00;
+    color: black;
+}
+
+/* 🔹 Hide leaderboard by default */
+.hidden {
+    display: none;
 }
