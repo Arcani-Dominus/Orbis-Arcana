@@ -21,25 +21,36 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔥 Real-Time Leaderboard Updates
-function loadLeaderboard() {
-    console.log("🏆 Loading leaderboard...");
-    
+// 🏆 Real-Time Leaderboard Function
+export function loadLeaderboard() {
+    console.log("🏆 Fetching leaderboard...");
+
     const leaderboardRef = collection(db, "players");
     const q = query(leaderboardRef, orderBy("level", "desc"));
 
     onSnapshot(q, (snapshot) => {
         let leaderboardHTML = "<ol>";
-        snapshot.forEach((doc, index) => {
-            const player = doc.data();
-            leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
-        });
-        leaderboardHTML += "</ol>";
 
-        document.getElementById("leaderboard").innerHTML = leaderboardHTML;
+        if (snapshot.empty) {
+            leaderboardHTML = "<p>No players found.</p>";
+        } else {
+            snapshot.forEach((doc, index) => {
+                const player = doc.data();
+                leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
+            });
+            leaderboardHTML += "</ol>";
+        }
+
+        const leaderboardElement = document.getElementById("leaderboard");
+        if (leaderboardElement) {
+            leaderboardElement.innerHTML = leaderboardHTML;
+        } else {
+            console.error("❌ Leaderboard element not found!");
+        }
+
         console.log("✅ Leaderboard updated successfully!");
     });
 }
 
-// Export Firebase Functions
-export { db, loadLeaderboard };
+// Ensure leaderboard is fetched after page loads
+document.addEventListener("DOMContentLoaded", loadLeaderboard);
