@@ -52,7 +52,8 @@
 
         console.log("📌 Firestore Data Loaded:", querySnapshot.docs.length, "records found."); 
 
-        if (querySnapshot.empty) {
+        // ✅ If no players exist, show "No players found" and return
+        if (querySnapshot.empty || querySnapshot.docs.length === 0) {
             leaderboardDiv.innerHTML = "<p>No players found.</p>";
             return;
         }
@@ -67,17 +68,22 @@
 
             console.log(`🔹 Player: ${playerName}, Level: ${playerLevel}`); 
 
-            leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
+            // ✅ Prevent "Unknown Player - Level 1" from appearing when Firestore is empty
+            if (playerName !== "Unknown Player" || playerLevel !== "N/A") {
+                leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
+            }
         });
         leaderboardHTML += "</ol>";
 
         leaderboardDiv.innerHTML = leaderboardHTML;
-        leaderboardDiv.classList.remove("hidden"); // ✅ Make leaderboard visible
+        leaderboardDiv.classList.remove("hidden");
+        leaderboardDiv.style.display = "block";
     } catch (error) {
         console.error("❌ Error loading leaderboard:", error);
         document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
     }
 }
+
 
 
 
