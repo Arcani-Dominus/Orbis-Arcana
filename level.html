@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orbis Arcana - Level</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js"></script>
 </head>
 <body>
     <div id="container">
@@ -12,6 +14,7 @@
         <h1 class="title">Orbis Arcana</h1>
         <h2 id="levelTitle">Level</h2>
 
+        <!-- 📜 Riddle Section -->
         <p id="riddleText" class="riddle">Loading riddle...</p>
         <input type="text" id="answerInput" class="input-field" placeholder="Enter your answer">
         <button id="submitAnswer" class="submit-button">Submit</button>
@@ -19,6 +22,7 @@
 
         <!-- 📢 Announcements Section -->
         <div id="announcements-section">
+            <h3>Announcements</h3>
             <p id="announcements">Loading announcements...</p>
         </div>
 
@@ -29,30 +33,51 @@
         </div>
     </div>
 
-    <!-- ✅ Load Scripts -->
+    <!-- ✅ JavaScript Code -->
     <script type="module">
-        import { loadAnnouncements } from "./announcements.js";
-        import { loadLeaderboard } from "./firebase-config.js";
+        import { db } from "./firebase-config.js";
+        import { collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import "./levels.js"; // ✅ Loads riddles & level system
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadAnnouncements();
+        // 🔹 LEADERBOARD SYSTEM
+        async function loadLeaderboard() {
+            const leaderboardDiv = document.getElementById("leaderboard");
+            leaderboardDiv.innerHTML = "<p>Loading...</p>";
 
-            const leaderboardBtn = document.getElementById("loadLeaderboardBtn");
-            const leaderboard = document.getElementById("leaderboard");
+            const leaderboardQuery = query(collection(db, "players"), orderBy("level", "desc"), orderBy("timestamp", "asc"));
+            const querySnapshot = await getDocs(leaderboardQuery);
 
-            if (!leaderboardBtn || !leaderboard) {
-                console.error("❌ Leaderboard elements not found in the DOM.");
-                return;
-            }
-
-            leaderboardBtn.addEventListener("click", () => {
-                leaderboard.classList.toggle("hidden");
-
-                if (!leaderboard.classList.contains("hidden")) {
-                    loadLeaderboard();
-                }
+            let leaderboardHTML = "<ol>";
+            querySnapshot.forEach(doc => {
+                const player = doc.data();
+                leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
             });
+            leaderboardHTML += "</ol>";
+
+            leaderboardDiv.innerHTML = leaderboardHTML;
+        }
+
+        // Toggle leaderboard visibility
+        document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+            document.getElementById("leaderboard").classList.toggle("hidden");
+            loadLeaderboard();
         });
+
+        // 🔹 ANNOUNCEMENTS SYSTEM
+        async function loadAnnouncements() {
+            try {
+                let response = await fetch("announcements.json");
+                let data = await response.json();
+                document.getElementById("announcements").innerText = data.message;
+            } catch (error) {
+                console.error("❌ Error loading announcements:", error);
+                document.getElementById("announcements").innerText = "Failed to load announcements.";
+            }
+        }
+
+        // Load announcements on page load
+        loadAnnouncements();
     </script>
+
 </body>
 </html>
