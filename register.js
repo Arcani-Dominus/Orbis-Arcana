@@ -1,7 +1,6 @@
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-// ✅ Function to Register the Player
 async function submitDetails() {
     console.log("✅ Submit button clicked!");
 
@@ -23,7 +22,7 @@ async function submitDetails() {
         await setDoc(doc(db, "players", studentID), {
             name: name,
             studentID: studentID,
-            level: 2, // Players start at Level 2
+            level: 2, // ✅ Players start at Level 2
             timestamp: new Date()
         });
         console.log("✅ Data successfully saved!");
@@ -31,7 +30,7 @@ async function submitDetails() {
         // 🔹 Store Player Data in Local Storage
         localStorage.setItem("studentID", studentID);
         localStorage.setItem("playerName", name);
-        localStorage.setItem("playerLevel", 2); // Start at Level 2
+        localStorage.setItem("playerLevel", 2); // ✅ Set level 2
 
         result.innerHTML = "<span class='success-text'>Registration successful! Redirecting to Level 2...</span>";
 
@@ -45,5 +44,5 @@ async function submitDetails() {
     }
 }
 
-// ✅ Make function available globally
+// ✅ Make function globally available
 window.submitDetails = submitDetails;
