@@ -41,7 +41,7 @@ async function submitAnswer() {
     const level = parseInt(urlParams.get("level")) || 2; // ✅ Define level first
 
     const answer = document.getElementById("answerInput").value.trim().toLowerCase();
-    const correctAnswer = answers[level].toLowerCase(); // ✅ Now level is defined
+    const correctAnswer = answers[level].toLowerCase(); // ✅ Normalize stored answer
     const feedback = document.getElementById("feedback");
 
     if (!studentID) {
@@ -56,17 +56,22 @@ async function submitAnswer() {
             const playerRef = doc(db, "players", studentID);
             await updateDoc(playerRef, { level: level + 1 });
 
+            console.log("✅ Firestore updated successfully!");
+
             const nextLevel = level + 1;
 
-            // ✅ Check if the next level exists in riddles object
-            if (riddles[nextLevel]) {
-                setTimeout(() => window.location.href = `level.html?level=${nextLevel}`, 2000);
-            } else {
-                console.log("⌛ No new levels yet. Redirecting to waiting page...");
-                setTimeout(() => window.location.href = `waiting.html?level=${level}`, 2000);
-            }
+            // ✅ Ensure the update is confirmed before redirecting
+            setTimeout(() => {
+                if (riddles[nextLevel]) {
+                    window.location.href = `level.html?level=${nextLevel}`;
+                } else {
+                    console.log("⌛ No new levels yet. Redirecting to waiting page...");
+                    window.location.href = `waiting.html?level=${level}`;
+                }
+            }, 2000); // ✅ Ensures Firestore update is complete
+
         } catch (error) {
-            console.error("Error updating level:", error);
+            console.error("❌ Firestore update failed:", error);
             feedback.innerHTML = "<span style='color: red;'>Error proceeding. Try again.</span>";
         }
     } else {
