@@ -11,6 +11,12 @@
         <h1 class="title">Orbis Arcana</h1>
         <p>🔮 A new challenge is coming soon. Stay tuned!</p>
         <p id="status">Checking for new levels...</p>
+
+<!-- 📢 Announcements Section -->
+<div id="announcements-section">
+    <p id="announcements">Loading announcements...</p>
+</div>
+
     </div>
 
     <script type="module">
@@ -29,6 +35,21 @@ setInterval(() => {
         document.getElementById("status").innerText = "No new levels yet. Keep waiting...";
     }
 }, 5000); // ✅ Checks every 5 seconds
+
+        // 🔹 ANNOUNCEMENTS SYSTEM (Only Message)
+async function loadAnnouncements() {
+    try {
+        let response = await fetch("announcements.json");
+        let data = await response.json();
+        document.getElementById("announcements").innerText = data.message;
+    } catch (error) {
+        console.error("❌ Error loading announcements:", error);
+        document.getElementById("announcements").innerText = "Failed to load announcements.";
+    }
+}
+
+// Load announcements on page load
+loadAnnouncements();
 
     </script>
 </body>
