@@ -1,28 +1,20 @@
 export async function loadAnnouncements() {
-    console.log("📢 Loading announcements from announcements.json...");
+    const announcementsElement = document.getElementById("announcements");
 
     try {
-        const response = await fetch("announcements.json");
+        const response = await fetch("announcements.json"); // Load JSON
         const data = await response.json();
 
-        const announcementsElement = document.getElementById("announcements");
-
-        if (!data.announcements || data.announcements.length === 0) {
-            console.log("ℹ️ No announcements found.");
-            announcementsElement.innerHTML = "No announcements at the moment.";
-            return;
+        if (data.length > 0) {
+            announcementsElement.innerHTML = data.map(a => `📢 ${a.message}`).join("<br>");
+        } else {
+            announcementsElement.innerText = "📢 No announcements as of yet.";
         }
-
-        // ✅ Display the latest announcement
-        const latestAnnouncement = data.announcements[0];
-        announcementsElement.innerHTML = `<strong>${latestAnnouncement.title}</strong>: ${latestAnnouncement.message}`;
-
-        console.log("✅ Announcements updated successfully!");
     } catch (error) {
-        console.error("❌ Error fetching announcements:", error);
-        document.getElementById("announcements").innerHTML = "Error loading announcements.";
+        console.error("Error loading announcements:", error);
+        announcementsElement.innerText = "📢 Error loading announcements.";
     }
 }
 
-// ✅ Ensure function runs when page loads
+// ✅ Load on page load
 document.addEventListener("DOMContentLoaded", loadAnnouncements);
