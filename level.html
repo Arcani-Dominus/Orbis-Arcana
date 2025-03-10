@@ -50,7 +50,6 @@
 
         const querySnapshot = await getDocs(leaderboardQuery);
 
-        // ✅ Log Firestore data in the console
         console.log("📌 Firestore Data Loaded:", querySnapshot.docs.length, "records found."); 
 
         if (querySnapshot.empty) {
@@ -60,25 +59,26 @@
 
         let leaderboardHTML = "<ol>";
         querySnapshot.forEach(doc => {
-    const player = doc.data();
+            const player = doc.data();
 
-    // ✅ Ensure name and level are defined
-    const playerName = player.name ? player.name : "Unknown Player";
-    const playerLevel = player.level !== undefined ? player.level : "N/A";
+            // ✅ Ensure name and level are defined
+            const playerName = player.name ? player.name : "Unknown Player";
+            const playerLevel = (player.level !== undefined && player.level !== null) ? player.level : "N/A";
 
-    console.log(`🔹 Player: ${playerName}, Level: ${playerLevel}`); 
+            console.log(`🔹 Player: ${playerName}, Level: ${playerLevel}`); 
 
-    leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
-});
-
+            leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
+        });
         leaderboardHTML += "</ol>";
 
         leaderboardDiv.innerHTML = leaderboardHTML;
+        leaderboardDiv.classList.remove("hidden"); // ✅ Make leaderboard visible
     } catch (error) {
         console.error("❌ Error loading leaderboard:", error);
         document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
     }
 }
+
 
 
         // ✅ Ensure button works correctly
