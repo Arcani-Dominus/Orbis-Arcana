@@ -7,20 +7,29 @@ const riddles = {
 
 // ✅ Load the current level and riddle
 export function loadLevel() {
-    const params = new URLSearchParams(window.location.search);
-    const level = params.get("level") || 1;
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const level = params.get("level") || 1;
 
-    console.log(`📌 Loading Level ${level}`);
-    
-    document.getElementById("levelTitle").innerText = `Level ${level}`;
+        console.log(`📌 Loading Level ${level}`);
 
-    // ✅ Set riddle text if it exists
-    if (riddles[level]) {
-        document.getElementById("riddleText").innerText = riddles[level];
-    } else {
-        document.getElementById("riddleText").innerText = "No riddle available for this level.";
-    }
+        // ✅ Check if elements exist before updating them
+        const levelTitle = document.getElementById("levelTitle");
+        const riddleText = document.getElementById("riddleText");
+
+        if (levelTitle) {
+            levelTitle.innerText = `Level ${level}`;
+        } else {
+            console.error("❌ Error: Element #levelTitle not found!");
+        }
+
+        if (riddleText) {
+            riddleText.innerText = riddles[level] || "No riddle available for this level.";
+        } else {
+            console.error("❌ Error: Element #riddleText not found!");
+        }
+    });
 }
 
-// ✅ Ensure function is called when page loads
-document.addEventListener("DOMContentLoaded", loadLevel);
+// ✅ Ensure function runs when page loads
+loadLevel();
