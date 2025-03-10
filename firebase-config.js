@@ -1,3 +1,4 @@
+// Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
 import { 
     getFirestore, 
@@ -7,7 +8,7 @@ import {
     onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-// 🔥 Firebase Configuration
+// ✅ Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyChs_NAolpqRZ-dV22bZ5KXhqXa5XuNJTI",
     authDomain: "orbis-arcana.firebaseapp.com",
@@ -17,11 +18,11 @@ const firebaseConfig = {
     appId: "1:474107878031:web:0869ada48ff6a446356efa"
 };
 
-// Initialize Firebase
+// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🏆 Real-Time Leaderboard Function
+// ✅ Load Real-Time Leaderboard
 export function loadLeaderboard() {
     console.log("🏆 Fetching leaderboard...");
 
@@ -51,6 +52,3 @@ export function loadLeaderboard() {
         console.log("✅ Leaderboard updated successfully!");
     });
 }
-
-// Ensure leaderboard is fetched after page loads
-document.addEventListener("DOMContentLoaded", loadLeaderboard);
