@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orbis Arcana - Level</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js"></script>
 </head>
 <body>
     <div id="container">
@@ -20,11 +18,8 @@
         <button id="submitAnswer" class="submit-button">Submit</button>
         <p id="feedback"></p>
 
-        <!-- 📢 Announcements Section -->
-        <div id="announcements-section">
-            <h3>Announcements</h3>
-            <p id="announcements">Loading announcements...</p>
-        </div>
+        <!-- 📢 Announcements Section (Only Message) -->
+        <p id="announcements">Loading announcements...</p>
 
         <!-- 🏆 Leaderboard Section -->
         <div id="leaderboard-section">
@@ -63,7 +58,7 @@
             loadLeaderboard();
         });
 
-        // 🔹 ANNOUNCEMENTS SYSTEM
+        // 🔹 ANNOUNCEMENTS SYSTEM (Only Message)
         async function loadAnnouncements() {
             try {
                 let response = await fetch("announcements.json");
