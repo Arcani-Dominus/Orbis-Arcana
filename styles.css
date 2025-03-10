@@ -102,3 +102,9 @@ body {
 .hidden {
     display: block;
 }
+
+#announcements {
+    display: block !important;
+    color: white; /* Adjust color if needed */
+}
+
