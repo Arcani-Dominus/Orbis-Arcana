@@ -16,13 +16,23 @@ const answers = {
 };
 
 // 🔹 Load Level & Riddle
+// 🔹 Load Level & Riddle (With Error Prevention)
 function loadLevel() {
     const urlParams = new URLSearchParams(window.location.search);
     const level = parseInt(urlParams.get("level")) || 2;
 
-    document.getElementById("levelTitle").innerText = `Level ${level}`;
-    document.getElementById("riddleText").innerText = riddles[level] || "Riddle not found!";
+    // ✅ Check if elements exist before modifying them
+    const levelTitle = document.getElementById("levelTitle");
+    const riddleText = document.getElementById("riddleText");
+
+    if (levelTitle && riddleText) {
+        levelTitle.innerText = `Level ${level}`;
+        riddleText.innerText = riddles[level] || "Riddle not found!";
+    } else {
+        console.warn("⚠️ WARNING: Level elements not found on this page. Skipping update.");
+    }
 }
+
 
 // 🔹 Check Answer & Progress
 async function submitAnswer() {
