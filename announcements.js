@@ -1,9 +1,8 @@
-// ✅ Load announcements from announcements.json
 export async function loadAnnouncements() {
     console.log("📢 Loading announcements from announcements.json...");
 
     try {
-        const response = await fetch("announcements.json"); // Fetch local file
+        const response = await fetch("announcements.json");
         const data = await response.json();
 
         const announcementsElement = document.getElementById("announcements");
@@ -24,3 +23,6 @@ export async function loadAnnouncements() {
         document.getElementById("announcements").innerHTML = "Error loading announcements.";
     }
 }
+
+// ✅ Ensure function runs when page loads
+document.addEventListener("DOMContentLoaded", loadAnnouncements);
