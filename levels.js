@@ -1,33 +1,26 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const levelData = {
-        1: { riddle: "I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?", answer: "shadow" },
-        2: { riddle: "The more you take, the more you leave behind. What am I?", answer: "footsteps" },
-        3: { riddle: "I can be cracked, made, told, and played. What am I?", answer: "joke" },
-        4: { riddle: "The more you remove from me, the bigger I get. What am I?", answer: "hole" }
-    };
+// ✅ Define riddles for each level
+const riddles = {
+    1: "I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?",
+    2: "The more you take, the more you leave behind. What am I?",
+    3: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?"
+};
 
-    // Get the current level from URL or saved progress
-    const urlParams = new URLSearchParams(window.location.search);
-    let level = parseInt(urlParams.get("level")) || parseInt(localStorage.getItem("playerLevel")) || 1;
+// ✅ Load the current level and riddle
+export function loadLevel() {
+    const params = new URLSearchParams(window.location.search);
+    const level = params.get("level") || 1;
 
-    if (!levelData[level]) level = 1; // Reset if level doesn't exist
+    console.log(`📌 Loading Level ${level}`);
+    
+    document.getElementById("levelTitle").innerText = `Level ${level}`;
 
-    document.getElementById("level-title").innerText = `Level ${level}`;
-    document.getElementById("riddle").innerText = levelData[level].riddle;
+    // ✅ Set riddle text if it exists
+    if (riddles[level]) {
+        document.getElementById("riddleText").innerText = riddles[level];
+    } else {
+        document.getElementById("riddleText").innerText = "No riddle available for this level.";
+    }
+}
 
-    document.getElementById("submitAnswer").addEventListener("click", () => {
-        const answer = document.getElementById("answerInput").value.trim().toLowerCase();
-        const feedback = document.getElementById("feedback");
-
-        if (answer === levelData[level].answer) {
-            feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to the next level...</span>";
-            localStorage.setItem("playerLevel", level + 1);
-
-            setTimeout(() => {
-                window.location.href = `level.html?level=${level + 1}`;
-            }, 2000);
-        } else {
-            feedback.innerHTML = "<span style='color: red;'>Wrong answer! Try again.</span>";
-        }
-    });
-});
+// ✅ Ensure function is called when page loads
+document.addEventListener("DOMContentLoaded", loadLevel);
