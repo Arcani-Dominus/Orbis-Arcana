@@ -37,17 +37,22 @@ function loadLevel() {
 // 🔹 Check Answer & Progress
 async function submitAnswer() {
     const studentID = localStorage.getItem("studentID");
+    const feedback = document.getElementById("feedback"); // ✅ Define feedback first
+
+    if (!studentID) {
+        feedback.innerHTML = "<span style='color: red;'>Error: You need to register first.</span>";
+        console.warn("⚠️ No student ID found in localStorage. Redirecting to register page...");
+        setTimeout(() => {
+            window.location.href = "register.html"; // ✅ Redirect to register page
+        }, 2000);
+        return;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const level = parseInt(urlParams.get("level")) || 2; // ✅ Define level first
 
     const answer = document.getElementById("answerInput").value.trim().toLowerCase();
     const correctAnswer = answers[level].toLowerCase(); // ✅ Normalize stored answer
-    const feedback = document.getElementById("feedback");
-
-    if (!studentID) {
-        feedback.innerHTML = "<span style='color: red;'>Error: You need to register first.</span>";
-        return;
-    }
 
     if (answer === correctAnswer) { 
         feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
