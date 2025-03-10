@@ -10,7 +10,7 @@ const riddles = {
 const answers = {
     2: "footsteps",
     3: "shadow",
-    4: "ARCANA42"
+    4: "arcana42"
 };
 
 // 🔹 Load Level & Riddle
