@@ -1,43 +1,24 @@
-import { db } from "./firebase-config.js";
-import { collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { db } from "./firebase.js"; // Ensure Firebase is properly imported
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js";
 
-// ✅ Load leaderboard from Firestore
 export async function loadLeaderboard() {
-    console.log("🏆 Loading leaderboard...");
-
-    const leaderboardRef = collection(db, "players");
-    const q = query(leaderboardRef, orderBy("level", "desc"), limit(10));
+    const leaderboardElement = document.getElementById("leaderboard");
 
     try {
-        const snapshot = await getDocs(q);
-        const leaderboardElement = document.getElementById("leaderboard");
+        const querySnapshot = await getDocs(collection(db, "leaderboard")); // Fetch from Firebase
+        let leaderboardData = [];
 
-        if (snapshot.empty) {
-            console.warn("ℹ️ No players found.");
-            leaderboardElement.innerHTML = "<p>No players yet.</p>";
-            return;
-        }
-
-        let leaderboardHTML = "<ol>";
-        snapshot.forEach((doc, index) => {
-            const player = doc.data();
-            leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
+        querySnapshot.forEach(doc => {
+            const entry = doc.data();
+            leaderboardData.push(`<p>🏆 ${entry.username}: ${entry.score} points</p>`);
         });
-        leaderboardHTML += "</ol>";
 
-        leaderboardElement.innerHTML = leaderboardHTML;
-        console.log("✅ Leaderboard updated successfully!");
+        leaderboardElement.innerHTML = leaderboardData.length > 0 ? leaderboardData.join("") : "No scores yet.";
     } catch (error) {
-        console.error("❌ Error fetching leaderboard:", error);
-        document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
+        console.error("Error loading leaderboard:", error);
+        leaderboardElement.innerText = "Error loading leaderboard.";
     }
 }
 
-// ✅ Ensure function runs when button is clicked
-document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-    const leaderboard = document.getElementById("leaderboard");
-    leaderboard.classList.toggle("hidden");
-    if (!leaderboard.classList.contains("hidden")) {
-        loadLeaderboard();
-    }
-});
+// ✅ Load leaderboard when button is clicked
+document.getElementById("loadLeaderboardBtn").addEventListener("click", loadLeaderboard);
