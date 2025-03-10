@@ -1,6 +1,6 @@
 export async function loadAnnouncements() {
     try {
-        console.log("Fetching announcements...");
+        console.log("📢 Fetching announcements...");
         const response = await fetch("announcements.json");
         if (!response.ok) throw new Error("Failed to load announcements");
 
@@ -19,23 +19,11 @@ export async function loadAnnouncements() {
             return;
         }
 
-        // If there's only one announcement, display just the message
-        if (data.length === 1) {
-            announcementsElement.innerText = data[0].message;
-        } else {
-            let announcementHTML = "<ul>";
-            data.forEach(announcement => {
-                announcementHTML += `<li>${announcement.message}</li>`;
-            });
-            announcementHTML += "</ul>";
-
-            announcementsElement.innerHTML = announcementHTML;
-        }
-
+        announcementsElement.innerText = data[0].message;
         console.log("✅ Announcements updated successfully!");
 
     } catch (error) {
         console.error("❌ Error loading announcements:", error);
-        document.getElementById("announcements").innerText = "Failed to load announcements.";
+        document.getElementById("announcements").innerText = "📢 Failed to load announcements.";
     }
 }
