@@ -51,18 +51,21 @@ async function submitAnswer() {
 
     if (answer === correctAnswer) { 
         feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
+        console.log(`✅ Correct answer entered for Level ${level}. Updating Firestore...`);
 
         try {
             const playerRef = doc(db, "players", studentID);
             await updateDoc(playerRef, { level: level + 1 });
 
-            console.log("✅ Firestore updated successfully!");
+            console.log("✅ Firestore update successful! Moving to next level...");
 
             const nextLevel = level + 1;
 
             // ✅ Ensure the update is confirmed before redirecting
             setTimeout(() => {
+                console.log(`🔄 Checking if Level ${nextLevel} exists in riddles...`);
                 if (riddles[nextLevel]) {
+                    console.log(`🎉 Level ${nextLevel} found! Redirecting now...`);
                     window.location.href = `level.html?level=${nextLevel}`;
                 } else {
                     console.log("⌛ No new levels yet. Redirecting to waiting page...");
