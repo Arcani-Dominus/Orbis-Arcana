@@ -30,7 +30,6 @@
     </div>
 
     <!-- ✅ Load Scripts -->
-    <script type="module" src="levels.js"></script>
     <script type="module">
         import { loadAnnouncements } from "./announcements.js";
         import { loadLeaderboard } from "./firebase-config.js";
@@ -49,4 +48,11 @@
             leaderboardBtn.addEventListener("click", () => {
                 leaderboard.classList.toggle("hidden");
 
-                if (!l
+                if (!leaderboard.classList.contains("hidden")) {
+                    loadLeaderboard();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
