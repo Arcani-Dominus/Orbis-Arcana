@@ -17,11 +17,16 @@ export async function loadAnnouncements() {
             return;
         }
 
-        // If no announcements, show default message
-        if (data.length === 0) {
-            announcementsElement.innerText = "No announcements at this time.";
+        // Check if data is an object (single announcement) or an array (multiple announcements)
+        if (Array.isArray(data)) {
+            if (data.length === 0) {
+                announcementsElement.innerText = "No announcements at this time.";
+            } else {
+                announcementsElement.innerText = data[0].message;
+            }
         } else {
-            announcementsElement.innerText = data[0].message;
+            // If it's a single object
+            announcementsElement.innerText = data.message || "No announcements at this time.";
         }
 
         console.log("✅ Announcements updated successfully!");
