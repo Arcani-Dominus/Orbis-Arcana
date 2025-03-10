@@ -12,15 +12,21 @@
         <h1 class="title">Orbis Arcana</h1>
         <h2 id="levelTitle">Level</h2>
 
-        <p class="riddle">🔑 Solve this riddle to proceed:</p>
+        <p id="riddleText" class="riddle">Loading riddle...</p>
         <input type="text" id="answerInput" class="input-field" placeholder="Enter your answer">
         <button id="submitAnswer" class="submit-button">Submit</button>
         <p id="feedback"></p>
 
-        <!-- 📢 Announcements Section -->
+        <!-- 📢 Announcements -->
         <div id="announcements-section">
             <h3>📢 Announcements</h3>
             <p id="announcements">Loading announcements...</p>
+        </div>
+
+        <!-- 🏆 Leaderboard -->
+        <div id="leaderboard-section">
+            <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
+            <div id="leaderboard" class="hidden"></div>
         </div>
     </div>
 
@@ -28,8 +34,19 @@
     <script type="module" src="levels.js"></script>
     <script type="module">
         import { loadAnnouncements } from "./announcements.js";
-        document.addEventListener("DOMContentLoaded", loadAnnouncements);
-    </script>
+        import { loadLeaderboard } from "./leaderboard.js";
 
+        document.addEventListener("DOMContentLoaded", () => {
+            loadAnnouncements();
+        });
+
+        document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+            const leaderboard = document.getElementById("leaderboard");
+            leaderboard.classList.toggle("hidden");
+            if (!leaderboard.classList.contains("hidden")) {
+                loadLeaderboard();
+            }
+        });
+    </script>
 </body>
 </html>
