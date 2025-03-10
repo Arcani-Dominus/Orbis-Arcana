@@ -25,9 +25,11 @@ function loadLevel() {
 // 🔹 Check Answer & Progress
 async function submitAnswer() {
     const studentID = localStorage.getItem("studentID");
-    const answer = document.getElementById("answerInput").value.trim().toLowerCase();
-const correctAnswer = answers[level].toLowerCase(); // ✅ Normalize stored answer
+    const urlParams = new URLSearchParams(window.location.search);
+    const level = parseInt(urlParams.get("level")) || 2; // ✅ Define level first
 
+    const answer = document.getElementById("answerInput").value.trim().toLowerCase();
+    const correctAnswer = answers[level].toLowerCase(); // ✅ Now level is defined
     const feedback = document.getElementById("feedback");
 
     if (!studentID) {
@@ -35,11 +37,7 @@ const correctAnswer = answers[level].toLowerCase(); // ✅ Normalize stored answ
         return;
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const level = parseInt(urlParams.get("level")) || 2;
-
-   if (answer === correctAnswer) {
- 
+    if (answer === correctAnswer) { 
         feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
 
         try {
@@ -63,6 +61,9 @@ const correctAnswer = answers[level].toLowerCase(); // ✅ Normalize stored answ
         feedback.innerHTML = "<span style='color: red;'>Wrong answer! Try again.</span>";
     }
 }
+
+
+    
 
 // 🔥 Attach Events on Page Load
 document.addEventListener("DOMContentLoaded", () => {
