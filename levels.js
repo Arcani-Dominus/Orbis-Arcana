@@ -8,7 +8,8 @@ const riddles = {
     4: "Follow Me!",
     5: "Really?",
     6: "OK",
-    7: "OK"
+    7: "OK",
+    8: "OK"
 };
 const answers = {
     2: "footsteps",
@@ -16,7 +17,8 @@ const answers = {
     4: "arcana42",
     5: "yes",
     6: "ok",
-    7: "ok"
+    7: "ok",
+    8: "ok"
 };
 
 // 🔹 Load Level & Riddle
