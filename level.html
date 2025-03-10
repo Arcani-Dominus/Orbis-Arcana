@@ -10,11 +10,10 @@
     <div id="container">
         <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
         <h1 class="title">Orbis Arcana</h1>
-        <h2 id="level-title"></h2>
+        <h2 id="levelTitle">Level</h2>
 
-        <p id="riddle" class="riddle"></p>
-        
-        <input type="text" id="answerInput" placeholder="Enter your answer" class="input-field">
+        <p class="riddle">🔑 Solve this riddle to proceed:</p>
+        <input type="text" id="answerInput" class="input-field" placeholder="Enter your answer">
         <button id="submitAnswer" class="submit-button">Submit</button>
         <p id="feedback"></p>
 
@@ -23,28 +22,14 @@
             <h3>📢 Announcements</h3>
             <p id="announcements">Loading announcements...</p>
         </div>
+    </div>
 
-        <!-- 🏆 Leaderboard Section -->
-<div id="leaderboard-section">
-    <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
-    <div id="leaderboard" class="hidden"></div>
-</div>
+    <!-- ✅ Load Scripts -->
+    <script type="module" src="levels.js"></script>
+    <script type="module">
+        import { loadAnnouncements } from "./announcements.js";
+        document.addEventListener("DOMContentLoaded", loadAnnouncements);
+    </script>
 
-<script type="module">
-    import { loadLeaderboard } from "./leaderboard.js";
-
-    document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-        const leaderboard = document.getElementById("leaderboard");
-        leaderboard.classList.toggle("hidden");
-        if (!leaderboard.classList.contains("hidden")) {
-            loadLeaderboard();
-        }
-    });
-</script>
-
-
-    <script src="levels.js"></script>
-    <script src="announcements.js"></script>
-    <script src="leaderboard.js"></script>
 </body>
 </html>
