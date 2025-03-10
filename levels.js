@@ -5,12 +5,14 @@ import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.
 const riddles = {
     2: "The more you take, the more you leave behind. What am I?",
     3: "I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?",
-    4: "Follow Me!"
+    4: "Follow Me!",
+    5: "Really?"
 };
 const answers = {
     2: "footsteps",
     3: "shadow",
-    4: "arcana42"
+    4: "arcana42",
+    5: "yes"
 };
 
 // 🔹 Load Level & Riddle
