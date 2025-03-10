@@ -1,24 +1,42 @@
-import { db } from "./firebase.js"; // Ensure Firebase is properly imported
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js";
+import { db } from "./firebase.js";
+import { collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-export async function loadLeaderboard() {
-    const leaderboardElement = document.getElementById("leaderboard");
+async function loadLeaderboard() {
+    console.log("Fetching leaderboard data...");
+
+    // 🔹 Reference the "players" collection in Firestore
+    const leaderboardRef = collection(db, "players");
+    const q = query(leaderboardRef, orderBy("level", "desc"), limit(10));
 
     try {
-        const querySnapshot = await getDocs(collection(db, "leaderboard")); // Fetch from Firebase
-        let leaderboardData = [];
+        const snapshot = await getDocs(q);
+        const leaderboardElement = document.getElementById("leaderboard");
 
-        querySnapshot.forEach(doc => {
-            const entry = doc.data();
-            leaderboardData.push(`<p>🏆 ${entry.username}: ${entry.score} points</p>`);
+        if (!leaderboardElement) {
+            console.error("Leaderboard element not found in DOM.");
+            return;
+        }
+
+        if (snapshot.empty) {
+            console.warn("No players found in Firestore.");
+            leaderboardElement.innerHTML = "<p>No players yet.</p>";
+            return;
+        }
+
+        let leaderboardHTML = "<ol>";
+        snapshot.forEach((doc, index) => {
+            const player = doc.data();
+            leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
         });
+        leaderboardHTML += "</ol>";
 
-        leaderboardElement.innerHTML = leaderboardData.length > 0 ? leaderboardData.join("") : "No scores yet.";
+        leaderboardElement.innerHTML = leaderboardHTML;
+        console.log("✅ Leaderboard updated successfully!");
     } catch (error) {
-        console.error("Error loading leaderboard:", error);
-        leaderboardElement.innerText = "Error loading leaderboard.";
+        console.error("❌ Error fetching leaderboard:", error);
+        document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
     }
 }
 
-// ✅ Load leaderboard when button is clicked
-document.getElementById("loadLeaderboardBtn").addEventListener("click", loadLeaderboard);
+// Load leaderboard when the page loads
+document.addEventListener("DOMContentLoaded", loadLeaderboard);
