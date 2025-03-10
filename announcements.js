@@ -3,7 +3,9 @@ export async function loadAnnouncements() {
         console.log("📢 Fetching announcements...");
         const response = await fetch("announcements.json");
 
-        if (!response.ok) throw new Error("Failed to load announcements");
+        if (!response.ok) {
+            throw new Error(`Failed to load announcements (Status: ${response.status})`);
+        }
 
         const data = await response.json();
         console.log("✅ Announcements data:", data);
@@ -15,14 +17,19 @@ export async function loadAnnouncements() {
             return;
         }
 
-        announcementsElement.innerText = data.length > 0 ? data[0].message : "No announcements at this time.";
-        console.log("✅ Announcements updated successfully!");
+        // If no announcements, show default message
+        if (data.length === 0) {
+            announcementsElement.innerText = "No announcements at this time.";
+        } else {
+            announcementsElement.innerText = data[0].message;
+        }
 
+        console.log("✅ Announcements updated successfully!");
     } catch (error) {
         console.error("❌ Error loading announcements:", error);
         document.getElementById("announcements").innerText = "📢 Failed to load announcements.";
     }
 }
 
-// Ensure script runs AFTER page loads
+// Ensure announcements load after the page fully loads
 document.addEventListener("DOMContentLoaded", loadAnnouncements);
