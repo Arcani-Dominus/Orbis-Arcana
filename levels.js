@@ -39,7 +39,7 @@ const correctAnswer = answers[level].toLowerCase(); // ✅ Normalize stored answ
     const level = parseInt(urlParams.get("level")) || 2;
 
    if (answer === correctAnswer) {
- {
+ 
         feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
 
         try {
