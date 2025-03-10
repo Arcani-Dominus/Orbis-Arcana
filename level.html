@@ -1,24 +1,52 @@
-<script type="module">
-    import { loadAnnouncements } from "./announcements.js";
-    import { loadLeaderboard } from "./firebase-config.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbis Arcana - Level</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
+        <h1 class="title">Orbis Arcana</h1>
+        <h2 id="levelTitle">Level</h2>
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadAnnouncements();
+        <p id="riddleText" class="riddle">Loading riddle...</p>
+        <input type="text" id="answerInput" class="input-field" placeholder="Enter your answer">
+        <button id="submitAnswer" class="submit-button">Submit</button>
+        <p id="feedback"></p>
 
-        const leaderboardBtn = document.getElementById("loadLeaderboardBtn");
-        const leaderboard = document.getElementById("leaderboard");
+        <!-- 📢 Announcements Section -->
+        <div id="announcements-section">
+            <p id="announcements">Loading announcements...</p>
+        </div>
 
-        if (!leaderboardBtn || !leaderboard) {
-            console.error("❌ Leaderboard elements not found in the DOM.");
-            return;
-        }
+        <!-- 🏆 Leaderboard Section -->
+        <div id="leaderboard-section">
+            <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
+            <div id="leaderboard" class="hidden">Loading leaderboard...</div>
+        </div>
+    </div>
 
-        leaderboardBtn.addEventListener("click", () => {
-            leaderboard.classList.toggle("hidden");
+    <!-- ✅ Load Scripts -->
+    <script type="module" src="levels.js"></script>
+    <script type="module">
+        import { loadAnnouncements } from "./announcements.js";
+        import { loadLeaderboard } from "./firebase-config.js";
 
-            if (!leaderboard.classList.contains("hidden")) {
-                loadLeaderboard();
+        document.addEventListener("DOMContentLoaded", () => {
+            loadAnnouncements();
+
+            const leaderboardBtn = document.getElementById("loadLeaderboardBtn");
+            const leaderboard = document.getElementById("leaderboard");
+
+            if (!leaderboardBtn || !leaderboard) {
+                console.error("❌ Leaderboard elements not found in the DOM.");
+                return;
             }
-        });
-    });
-</script>
+
+            leaderboardBtn.addEventListener("click", () => {
+                leaderboard.classList.toggle("hidden");
+
+                if (!l
