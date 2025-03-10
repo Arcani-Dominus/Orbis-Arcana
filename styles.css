@@ -100,5 +100,5 @@ body {
 
 /* 🔹 HIDE ANNOUNCEMENTS & LEADERBOARD INITIALLY */
 .hidden {
-    display: none;
+    display: block;
 }
