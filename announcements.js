@@ -15,12 +15,7 @@ export async function loadAnnouncements() {
             return;
         }
 
-        if (data.length === 0) {
-            announcementsElement.innerText = "No announcements at this time.";
-            return;
-        }
-
-        announcementsElement.innerText = data[0].message;
+        announcementsElement.innerText = data.length > 0 ? data[0].message : "No announcements at this time.";
         console.log("✅ Announcements updated successfully!");
 
     } catch (error) {
@@ -28,3 +23,6 @@ export async function loadAnnouncements() {
         document.getElementById("announcements").innerText = "📢 Failed to load announcements.";
     }
 }
+
+// Ensure script runs AFTER page loads
+document.addEventListener("DOMContentLoaded", loadAnnouncements);
