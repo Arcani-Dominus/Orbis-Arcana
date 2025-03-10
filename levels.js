@@ -70,3 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadLevel();
     document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
 });
+
+export { riddles };
+
