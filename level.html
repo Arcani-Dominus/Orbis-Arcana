@@ -60,10 +60,17 @@
 
         let leaderboardHTML = "<ol>";
         querySnapshot.forEach(doc => {
-            const player = doc.data();
-            console.log(`🔹 Player: ${player.name}, Level: ${player.level}`); // ✅ Debugging each player
-            leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
-        });
+    const player = doc.data();
+
+    // ✅ Ensure name and level are defined
+    const playerName = player.name ? player.name : "Unknown Player";
+    const playerLevel = player.level !== undefined ? player.level : "N/A";
+
+    console.log(`🔹 Player: ${playerName}, Level: ${playerLevel}`); 
+
+    leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
+});
+
         leaderboardHTML += "</ol>";
 
         leaderboardDiv.innerHTML = leaderboardHTML;
