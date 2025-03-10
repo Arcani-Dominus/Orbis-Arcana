@@ -1,35 +1,58 @@
-// ✅ Define riddles for each level
+import { db } from "./firebase-config.js";
+import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+
+// 🔥 Define Riddles & Answers
 const riddles = {
-    1: "I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?",
     2: "The more you take, the more you leave behind. What am I?",
-    3: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?"
+    3: "I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?"
+};
+const answers = {
+    2: "footsteps",
+    3: "shadow"
 };
 
-// ✅ Load the current level and riddle
-export function loadLevel() {
-    document.addEventListener("DOMContentLoaded", () => {
-        const params = new URLSearchParams(window.location.search);
-        const level = params.get("level") || 1;
+// 🔹 Load Level & Riddle
+function loadLevel() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const level = parseInt(urlParams.get("level")) || 2;
 
-        console.log(`📌 Loading Level ${level}`);
-
-        // ✅ Check if elements exist before updating them
-        const levelTitle = document.getElementById("levelTitle");
-        const riddleText = document.getElementById("riddleText");
-
-        if (levelTitle) {
-            levelTitle.innerText = `Level ${level}`;
-        } else {
-            console.error("❌ Error: Element #levelTitle not found!");
-        }
-
-        if (riddleText) {
-            riddleText.innerText = riddles[level] || "No riddle available for this level.";
-        } else {
-            console.error("❌ Error: Element #riddleText not found!");
-        }
-    });
+    document.getElementById("levelTitle").innerText = `Level ${level}`;
+    document.getElementById("riddleText").innerText = riddles[level] || "Riddle not found!";
 }
 
-// ✅ Ensure function runs when page loads
-loadLevel();
+// 🔹 Check Answer & Progress
+async function submitAnswer() {
+    const studentID = localStorage.getItem("studentID");
+    const answer = document.getElementById("answerInput").value.trim().toLowerCase();
+    const feedback = document.getElementById("feedback");
+
+    if (!studentID) {
+        feedback.innerHTML = "<span style='color: red;'>Error: You need to register first.</span>";
+        return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const level = parseInt(urlParams.get("level")) || 2;
+
+    if (answer === answers[level]) {
+        feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
+
+        try {
+            const playerRef = doc(db, "players", studentID);
+            await updateDoc(playerRef, { level: level + 1 });
+
+            setTimeout(() => window.location.href = `level.html?level=${level + 1}`, 2000);
+        } catch (error) {
+            console.error("Error updating level:", error);
+            feedback.innerHTML = "<span style='color: red;'>Error proceeding. Try again.</span>";
+        }
+    } else {
+        feedback.innerHTML = "<span style='color: red;'>Wrong answer! Try again.</span>";
+    }
+}
+
+// 🔥 Attach Events on Page Load
+document.addEventListener("DOMContentLoaded", () => {
+    loadLevel();
+    document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
+});
