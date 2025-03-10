@@ -41,7 +41,15 @@ async function submitAnswer() {
             const playerRef = doc(db, "players", studentID);
             await updateDoc(playerRef, { level: level + 1 });
 
-            setTimeout(() => window.location.href = `level.html?level=${level + 1}`, 2000);
+            const nextLevel = level + 1;
+
+            // ✅ Check if the next level exists in riddles object
+            if (riddles[nextLevel]) {
+                setTimeout(() => window.location.href = `level.html?level=${nextLevel}`, 2000);
+            } else {
+                console.log("⌛ No new levels yet. Redirecting to waiting page...");
+                setTimeout(() => window.location.href = `waiting.html?level=${level}`, 2000);
+            }
         } catch (error) {
             console.error("Error updating level:", error);
             feedback.innerHTML = "<span style='color: red;'>Error proceeding. Try again.</span>";
