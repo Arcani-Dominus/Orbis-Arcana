@@ -30,29 +30,48 @@
 
     <!-- ✅ JavaScript Code -->
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+
+        // ✅ Import Firebase Config (Ensures `db` is available)
         import { db } from "./firebase-config.js";
-        import { collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
         import "./levels.js"; // ✅ Loads riddles & level system
 
         // 🔹 LEADERBOARD SYSTEM
         async function loadLeaderboard() {
-            const leaderboardDiv = document.getElementById("leaderboard");
-            leaderboardDiv.innerHTML = "<p>Loading...</p>";
+            try {
+                const leaderboardDiv = document.getElementById("leaderboard");
+                leaderboardDiv.innerHTML = "<p>Loading...</p>";
 
-            const leaderboardQuery = query(collection(db, "players"), orderBy("level", "desc"), orderBy("timestamp", "asc"));
-            const querySnapshot = await getDocs(leaderboardQuery);
+                // ✅ Fetch player data sorted by level & timestamp
+                const leaderboardQuery = query(
+                    collection(db, "players"),
+                    orderBy("level", "desc"),
+                    orderBy("timestamp", "asc")
+                );
 
-            let leaderboardHTML = "<ol>";
-            querySnapshot.forEach(doc => {
-                const player = doc.data();
-                leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
-            });
-            leaderboardHTML += "</ol>";
+                const querySnapshot = await getDocs(leaderboardQuery);
+                
+                if (querySnapshot.empty) {
+                    leaderboardDiv.innerHTML = "<p>No players found.</p>";
+                    return;
+                }
 
-            leaderboardDiv.innerHTML = leaderboardHTML;
+                let leaderboardHTML = "<ol>";
+                querySnapshot.forEach(doc => {
+                    const player = doc.data();
+                    leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
+                });
+                leaderboardHTML += "</ol>";
+
+                leaderboardDiv.innerHTML = leaderboardHTML;
+            } catch (error) {
+                console.error("❌ Error loading leaderboard:", error);
+                document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
+            }
         }
 
-        // Toggle leaderboard visibility
+        // ✅ Ensure button works correctly
         document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
             document.getElementById("leaderboard").classList.toggle("hidden");
             loadLeaderboard();
