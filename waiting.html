@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbis Arcana - Waiting Room</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <h1 class="title">Orbis Arcana</h1>
+        <p>🔮 A new challenge is coming soon. Stay tuned!</p>
+        <p id="status">Checking for new levels...</p>
+    </div>
+
+    <script type="module">
+        import { riddles } from "./levels.js"; // ✅ Import riddles data
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const lastLevel = parseInt(urlParams.get("level")) || 1;
+        const nextLevel = lastLevel + 1;
+
+        // 🔄 Check every 5 seconds for a new level
+        setInterval(() => {
+            console.log("🔍 Checking for new levels...");
+            if (riddles[nextLevel]) {
+                console.log("🎉 New level found! Redirecting...");
+                window.location.href = `level.html?level=${nextLevel}`;
+            } else {
+                document.getElementById("status").innerText = "No new levels yet. Keep waiting...";
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
