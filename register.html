@@ -21,10 +21,17 @@
 
         <p id="result"></p>
 
-    <!-- ✅ Load Firebase & Register Script -->
     <script type="module">
-        import "./register.js"; // ✅ Ensure register.js is properly imported
-    </script>
+    import { submitDetails } from "./register.js"; // ✅ Ensure register.js is imported
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("submitBtn").addEventListener("click", () => {
+            console.log("📌 Calling submitDetails() function...");
+            submitDetails(); // ✅ Call function
+        });
+    });
+</script>
+
 
 </body>
 </html>
