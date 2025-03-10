@@ -1,4 +1,3 @@
-// Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
 import { 
     getFirestore, 
@@ -8,7 +7,7 @@ import {
     onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-// Firebase configuration
+// 🔥 Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyChs_NAolpqRZ-dV22bZ5KXhqXa5XuNJTI",
     authDomain: "orbis-arcana.firebaseapp.com",
@@ -24,22 +23,23 @@ const db = getFirestore(app);
 
 // 🔥 Real-Time Leaderboard Updates
 function loadLeaderboard() {
+    console.log("🏆 Loading leaderboard...");
+    
     const leaderboardRef = collection(db, "players");
-    const q = query(leaderboardRef, orderBy("level", "desc")); // Sorting by highest level
+    const q = query(leaderboardRef, orderBy("level", "desc"));
 
     onSnapshot(q, (snapshot) => {
         let leaderboardHTML = "<ol>";
-        snapshot.forEach(doc => {
+        snapshot.forEach((doc, index) => {
             const player = doc.data();
-            leaderboardHTML += `<li>${player.name} (Level ${player.level})</li>`;
+            leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
         });
         leaderboardHTML += "</ol>";
 
         document.getElementById("leaderboard").innerHTML = leaderboardHTML;
+        console.log("✅ Leaderboard updated successfully!");
     });
 }
 
-
-
-// Load real-time data when the page loads
+// Export Firebase Functions
 export { db, loadLeaderboard };
