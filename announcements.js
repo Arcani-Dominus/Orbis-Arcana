@@ -15,21 +15,27 @@ export async function loadAnnouncements() {
         }
 
         if (data.length === 0) {
-            announcementsElement.innerText = "📢 No announcements at this time.";
+            announcementsElement.innerText = "No announcements at this time.";
             return;
         }
 
-        let announcementHTML = "<ul>";
-        data.forEach(announcement => {
-            announcementHTML += `<li><strong>${announcement.date}:</strong> ${announcement.message}</li>`;
-        });
-        announcementHTML += "</ul>";
+        // If there's only one announcement, display just the message
+        if (data.length === 1) {
+            announcementsElement.innerText = data[0].message;
+        } else {
+            let announcementHTML = "<ul>";
+            data.forEach(announcement => {
+                announcementHTML += `<li>${announcement.message}</li>`;
+            });
+            announcementHTML += "</ul>";
 
-        announcementsElement.innerHTML = announcementHTML;
+            announcementsElement.innerHTML = announcementHTML;
+        }
+
         console.log("✅ Announcements updated successfully!");
 
     } catch (error) {
         console.error("❌ Error loading announcements:", error);
-        document.getElementById("announcements").innerText = "📢 Failed to load announcements.";
+        document.getElementById("announcements").innerText = "Failed to load announcements.";
     }
 }
