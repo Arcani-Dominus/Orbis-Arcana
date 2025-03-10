@@ -23,7 +23,12 @@ export async function submitDetails() {
             level: 2,
             timestamp: new Date()
         });
+
         console.log("✅ Data successfully saved!");
+        
+        // ✅ Store studentID in localStorage AFTER saving to Firestore
+        localStorage.setItem("studentID", studentID);
+        console.log("✅ studentID stored in localStorage:", studentID);
 
         result.innerHTML = "<span class='success-text'>Registration successful! Redirecting to Level 2...</span>";
 
@@ -36,7 +41,6 @@ export async function submitDetails() {
         result.innerHTML = "<span style='color: red;'>Error submitting details. Check console.</span>";
     }
 }
-
 
 // ✅ Make function globally available
 window.submitDetails = submitDetails;
