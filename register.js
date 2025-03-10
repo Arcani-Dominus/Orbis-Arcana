@@ -1,6 +1,7 @@
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
+// ✅ Function to Register the Player
 async function submitDetails() {
     console.log("✅ Submit button clicked!");
 
@@ -44,5 +45,5 @@ async function submitDetails() {
     }
 }
 
-// ✅ Make function globally available
+// ✅ Make function available globally
 window.submitDetails = submitDetails;
