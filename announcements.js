@@ -2,6 +2,7 @@ export async function loadAnnouncements() {
     try {
         console.log("📢 Fetching announcements...");
         const response = await fetch("announcements.json");
+
         if (!response.ok) throw new Error("Failed to load announcements");
 
         const data = await response.json();
