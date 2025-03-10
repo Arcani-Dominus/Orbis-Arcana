@@ -21,19 +21,9 @@
 
         <p id="result"></p>
 
-        
-
     <!-- ✅ Load Firebase & Register Script -->
-    <script type="module" src="register.js"></script>
-
-    <script>
-        // ✅ Ensure function is available before attaching event listener
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("submitBtn").addEventListener("click", () => {
-                console.log("📌 Calling submitDetails()");
-                submitDetails();
-            });
-        });
+    <script type="module">
+        import "./register.js"; // ✅ Ensure register.js is properly imported
     </script>
 
 </body>
