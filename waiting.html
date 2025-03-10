@@ -14,22 +14,22 @@
     </div>
 
     <script type="module">
-        import { riddles } from "./levels.js"; // ✅ Import riddles data
+        import { riddles } from "./levels.js";
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const lastLevel = parseInt(urlParams.get("level")) || 1;
-        const nextLevel = lastLevel + 1;
+const urlParams = new URLSearchParams(window.location.search);
+const lastLevel = parseInt(urlParams.get("level")) || 2;
+const nextLevel = lastLevel + 1;
 
-        // 🔄 Check every 5 seconds for a new level
-        setInterval(() => {
-            console.log("🔍 Checking for new levels...");
-            if (riddles[nextLevel]) {
-                console.log("🎉 New level found! Redirecting...");
-                window.location.href = `level.html?level=${nextLevel}`;
-            } else {
-                document.getElementById("status").innerText = "No new levels yet. Keep waiting...";
-            }
-        }, 5000);
+setInterval(() => {
+    console.log("🔍 Checking for new levels...");
+    if (riddles[nextLevel]) {
+        console.log("🎉 New level found! Redirecting...");
+        window.location.href = `level.html?level=${nextLevel}`;
+    } else {
+        document.getElementById("status").innerText = "No new levels yet. Keep waiting...";
+    }
+}, 5000); // ✅ Checks every 5 seconds
+
     </script>
 </body>
 </html>
