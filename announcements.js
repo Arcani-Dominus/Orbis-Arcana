@@ -1,10 +1,10 @@
-async function loadAnnouncements() {
+export async function loadAnnouncements() {
     console.log("Fetching announcements...");
     
     try {
         const response = await fetch("announcements.json");
         if (!response.ok) throw new Error("Failed to fetch announcements.");
-        
+
         const announcements = await response.json();
         const announcementsElement = document.getElementById("announcements");
 
@@ -31,6 +31,3 @@ async function loadAnnouncements() {
         document.getElementById("announcements").innerHTML = "<p>Error loading announcements.</p>";
     }
 }
-
-// Load announcements when the page loads
-document.addEventListener("DOMContentLoaded", loadAnnouncements);
