@@ -32,8 +32,8 @@
     <!-- ✅ Load Scripts -->
     <script type="module">
         import { loadAnnouncements } from "./announcements.js";
-        import { loadLeaderboard } from "./leaderboard.js";
-
+        import { loadLeaderboard } from "./firebase-config.js";  <!-- ✅ Fix Import -->
+        
         document.addEventListener("DOMContentLoaded", () => {
             loadAnnouncements(); // 🔹 Load Announcements on page load
 
