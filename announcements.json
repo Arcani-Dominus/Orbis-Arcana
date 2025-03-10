@@ -1,6 +1,9 @@
-[
-    {
-        "title": "Update!",
-        "message": "Next level coming soon!"
-    }
-]
+{
+    "announcements": [
+        {
+            "title": "Next Level Coming Soon",
+            "message": "Level 3 will be released soon. Stay tuned!",
+            "timestamp": "2025-03-10T04:41:15Z"
+        }
+    ]
+}
