@@ -32,9 +32,12 @@
     <script type="module" src="register.js"></script>
 
     <script>
-        // ✅ Attach event listener when page loads
+        // ✅ Ensure function is available before attaching event listener
         document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("submitBtn").addEventListener("click", submitDetails);
+            document.getElementById("submitBtn").addEventListener("click", () => {
+                console.log("📌 Calling submitDetails()");
+                submitDetails();
+            });
         });
     </script>
 
