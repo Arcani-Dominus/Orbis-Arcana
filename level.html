@@ -23,42 +23,19 @@
         </div>
 
         <!-- 🏆 Leaderboard Section -->
-<div id="leaderboard-section">
-    <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
-    <div id="leaderboard" class="hidden">Loading leaderboard...</div>
-</div>
-
-<script type="module">
-    import { loadLeaderboard } from "./firebase-config.js";
-
-    document.addEventListener("DOMContentLoaded", () => {
-        const leaderboardBtn = document.getElementById("loadLeaderboardBtn");
-        const leaderboard = document.getElementById("leaderboard");
-
-        if (!leaderboardBtn || !leaderboard) {
-            console.error("❌ Leaderboard elements not found in the DOM.");
-            return;
-        }
-
-        leaderboardBtn.addEventListener("click", () => {
-            if (leaderboard.classList.contains("hidden")) {
-                leaderboard.classList.remove("hidden");
-                loadLeaderboard(); // 🔹 Load when shown
-            } else {
-                leaderboard.classList.add("hidden");
-            }
-        });
-    });
-</script>
-
+        <div id="leaderboard-section">
+            <button id="loadLeaderboardBtn" class="toggle-button">🏆 Show Leaderboard</button>
+            <div id="leaderboard" class="hidden">Loading leaderboard...</div>
+        </div>
+    </div>
 
     <!-- ✅ Load Scripts -->
     <script type="module">
         import { loadAnnouncements } from "./announcements.js";
-        import { loadLeaderboard } from "./firebase-config.js";  <!-- ✅ Fix Import -->
-        
+        import { loadLeaderboard } from "./firebase-config.js";
+
         document.addEventListener("DOMContentLoaded", () => {
-            loadAnnouncements(); // 🔹 Load Announcements on page load
+            loadAnnouncements(); // 🔹 Load announcements on page load
 
             const leaderboardBtn = document.getElementById("loadLeaderboardBtn");
             const leaderboard = document.getElementById("leaderboard");
