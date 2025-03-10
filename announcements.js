@@ -1,33 +1,35 @@
 export async function loadAnnouncements() {
-    console.log("Fetching announcements...");
-    
     try {
+        console.log("Fetching announcements...");
         const response = await fetch("announcements.json");
-        if (!response.ok) throw new Error("Failed to fetch announcements.");
+        if (!response.ok) throw new Error("Failed to load announcements");
 
-        const announcements = await response.json();
+        const data = await response.json();
+        console.log("✅ Announcements data:", data);
+
         const announcementsElement = document.getElementById("announcements");
 
         if (!announcementsElement) {
-            console.error("Announcements element not found in DOM.");
+            console.error("❌ Element with ID 'announcements' not found in the HTML!");
             return;
         }
 
-        if (announcements.length === 0) {
-            announcementsElement.innerHTML = "<p>No announcements as of yet.</p>";
+        if (data.length === 0) {
+            announcementsElement.innerText = "📢 No announcements at this time.";
             return;
         }
 
-        let announcementsHTML = "<ul>";
-        announcements.forEach(announcement => {
-            announcementsHTML += `<li><strong>${announcement.date}:</strong> ${announcement.message}</li>`;
+        let announcementHTML = "<ul>";
+        data.forEach(announcement => {
+            announcementHTML += `<li><strong>${announcement.date}:</strong> ${announcement.message}</li>`;
         });
-        announcementsHTML += "</ul>";
+        announcementHTML += "</ul>";
 
-        announcementsElement.innerHTML = announcementsHTML;
+        announcementsElement.innerHTML = announcementHTML;
         console.log("✅ Announcements updated successfully!");
+
     } catch (error) {
         console.error("❌ Error loading announcements:", error);
-        document.getElementById("announcements").innerHTML = "<p>Error loading announcements.</p>";
+        document.getElementById("announcements").innerText = "📢 Failed to load announcements.";
     }
 }
