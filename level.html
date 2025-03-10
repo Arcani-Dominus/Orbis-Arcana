@@ -81,11 +81,14 @@
 
 
 
-        // ✅ Ensure button works correctly
-        document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-            document.getElementById("leaderboard").classList.toggle("hidden");
-            loadLeaderboard();
-        });
+      document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+    loadLeaderboard(); // ✅ Load data first
+    setTimeout(() => {
+        document.getElementById("leaderboard").classList.remove("hidden");
+        document.getElementById("leaderboard").style.display = "block"; // ✅ Ensure visibility
+    }, 500); // ✅ Small delay to let data load
+});
+
 
         // 🔹 ANNOUNCEMENTS SYSTEM (Only Message)
         async function loadAnnouncements() {
