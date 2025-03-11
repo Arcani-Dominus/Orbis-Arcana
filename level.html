@@ -45,16 +45,15 @@
 
         const leaderboardQuery = query(
             collection(db, "players"),
-            orderBy("level", "desc"),
-            orderBy("timestamp", "asc")
+            orderBy("level", "desc")
         );
 
         const querySnapshot = await getDocs(leaderboardQuery);
 
-        console.log("📌 Firestore Data Loaded:", querySnapshot.docs.length, "records found."); 
+        console.log("📌 Firestore Data Loaded:", querySnapshot.docs.length, "records found.");
 
-        // ✅ If no players exist, show "No players found" and return
         if (querySnapshot.empty || querySnapshot.docs.length === 0) {
+            console.warn("⚠ No players found in Firestore!");
             leaderboardDiv.innerHTML = "<p>No players found.</p>";
             return;
         }
@@ -62,20 +61,17 @@
         let leaderboardHTML = "<ol>";
         querySnapshot.forEach(doc => {
             const player = doc.data();
-            console.log("🔥 Firestore Player Data:", player); // ✅ Debugging log
+            console.log("🔥 Firestore Player Data:", player); // ✅ Log full player data
 
-            // ✅ Check if both name and level exist
-            if (!player.name || player.name.trim() === "" || player.level === undefined || player.level === null) {
-                console.log("⚠ Skipping invalid player entry:", player);
-                return; // ❌ Skip invalid entries
+            if (!player.name || player.level === undefined || player.level === null) {
+                console.warn("⚠ Skipping invalid player:", player);
+                return; 
             }
 
-            console.log(`🔹 Player: ${player.name}, Level: ${player.level}`); 
             leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
         });
         leaderboardHTML += "</ol>";
 
-        // ✅ If no valid players, show "No players found"
         if (leaderboardHTML === "<ol></ol>") {
             leaderboardDiv.innerHTML = "<p>No players found.</p>";
         } else {
@@ -86,9 +82,10 @@
         leaderboardDiv.style.display = "block";
     } catch (error) {
         console.error("❌ Error loading leaderboard:", error);
-        document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
+        leaderboardDiv.innerHTML = "<p>Error loading leaderboard.</p>";
     }
 }
+
 
 
         // ✅ Ensure button works correctly
