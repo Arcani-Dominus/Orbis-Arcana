@@ -3,35 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orbis Arcana - Register</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Register - Orbis Arcana</title>
+    <script type="module" src="register.js"></script>
 </head>
 <body>
-    <div id="container">
-        <img src="Orbis Arcane.png" alt="Orbis Arcana Logo" class="logo">
-        <h1 class="title">Orbis Arcana</h1>
-        <h2>Register to Begin</h2>
+    <h1>Orbis Arcana - Register</h1>
+    <input type="email" id="email" placeholder="Enter your email">
+    <input type="password" id="password" placeholder="Enter your password">
+    <button id="registerBtn">Register</button>
+    <p id="result"></p>
 
-        <!-- 🔹 Input Fields -->
-        <div class="input-container">
-            <input type="text" id="nameInput" class="input-field" placeholder="Your Name">
-            <input type="text" id="studentIDInput" class="input-field" placeholder="Your Student ID">
-            <button id="submitBtn" class="submit-button">Submit</button>
-        </div>
-
-        <p id="result"></p>
-
-    <script type="module">
-    import { submitDetails } from "./register.js"; // ✅ Ensure register.js is imported
-
-    document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("submitBtn").addEventListener("click", () => {
-            console.log("📌 Calling submitDetails() function...");
-            submitDetails(); // ✅ Call function
-        });
-    });
-</script>
-
-
+    <p>Already have an account? <a href="login.html">Login here</a></p>
 </body>
 </html>
