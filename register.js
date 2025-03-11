@@ -1,46 +1,35 @@
-import { db } from "./firebase-config.js";
-import { collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-// ✅ Export the function properly
-export async function submitDetails() {
-    console.log("✅ Submit button clicked!");
-
-    const name = document.getElementById("nameInput").value.trim();
-    const studentID = document.getElementById("studentIDInput").value.trim();
+document.getElementById("registerBtn").addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
     const result = document.getElementById("result");
 
-    if (!name || !studentID) {
-        console.warn("❌ Missing details!");
+    if (!email || !password) {
         result.innerHTML = "<span style='color: red;'>Please enter all details.</span>";
         return;
     }
 
     try {
-        console.log("⏳ Saving player data to Firestore...");
-        await setDoc(doc(db, "players", studentID), {
-            name: name,
-            studentID: studentID,
-            level: 2,
-            timestamp: new Date()
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // ✅ Store user in Firestore
+        await setDoc(doc(db, "players", user.uid), {
+            email: email,
+            level: 2
         });
 
-        console.log("✅ Data successfully saved!");
-        
-        // ✅ Store studentID in localStorage AFTER saving to Firestore
-        localStorage.setItem("studentID", studentID);
-        console.log("✅ studentID stored in localStorage:", studentID);
-
-        result.innerHTML = "<span class='success-text'>Registration successful! Redirecting to Level 2...</span>";
+        localStorage.setItem("userId", user.uid); // ✅ Save session
+        result.innerHTML = "<span class='success-text'>Registration successful! Redirecting...</span>";
 
         setTimeout(() => {
-            console.log("🔄 Redirecting to Level 2...");
             window.location.href = "level.html?level=2";
         }, 2000);
     } catch (error) {
-        console.error("❌ Error writing to Firestore:", error);
-        result.innerHTML = "<span style='color: red;'>Error submitting details. Check console.</span>";
+        console.error("❌ Registration failed:", error);
+        result.innerHTML = `<span style='color: red;'>Error: ${error.message}</span>`;
     }
-}
-
-// ✅ Make function globally available
-window.submitDetails = submitDetails;
+});
