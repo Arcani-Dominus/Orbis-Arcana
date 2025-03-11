@@ -7,13 +7,13 @@ const riddles = {
     2: "The more you take, the more you leave behind. What am I?",
     3: "Coordniates \n Find Me!",
     4: ".. / .... ..- -- / -... ..- - / .... .- ...- . / -. --- / -- --- ..- - .... --..--  \n .. / -... .-. . .- - .... . / -... ..- - / .... .- ...- . / -. --- / .-.. ..- -. --. ... --..-- \n .-- .... . -. / -.. .- .-. -.- -. . ... ... / ..-. .- .-.. .-.. ... --..-- / .. / -.- . . .--. / - .... . / .-.. .. --. .... - ... / .- .-.. .. ...- . .-.-.- \n .-- .... .- - / .- -- / .. ..--.. \n Find Answer Near Me!",
-    5: "I lead you up, I lead you down, Yet in my shadow, secrets are found.Not the front, but the hidden way, Find me where few choose to stay."
+    5: "A eplac wrehe dahns tearce dna ednm, \nTamel nda oodw, sloot revne dne. \nEwher rpkass yam ylf, nda saedii rgow, \nDinf em wrehe eth scmtafnrer og."
 };
 const answers = {
     2: "footsteps",
     3: "arcana42",
     4: "ARBOR88",
-    5: "HIDDENSTEP33"
+    5: "FORGE58"
 };
 
 // ✅ Check If We Are on level.html Before Running the Script
