@@ -57,3 +57,14 @@ onAuthStateChanged(auth, async (user) => {
         }
     }
 });
+
+// ✅ Force reload to get latest data on mobile
+window.onload = function() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(registration => {
+                registration.unregister();
+            });
+        });
+    }
+};
