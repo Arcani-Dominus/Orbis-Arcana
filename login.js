@@ -1,5 +1,6 @@
-import { auth } from "./firebase-config.js";
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+import { auth, db } from "./firebase-config.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 document.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("email").value.trim();
@@ -7,7 +8,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     const result = document.getElementById("result");
 
     if (!email || !password) {
-        result.innerHTML = "<span style='color: red;'>Please enter all details.</span>";
+        result.innerHTML = "<span style='color: red;'>Please enter both email and password.</span>";
         return;
     }
 
@@ -15,34 +16,28 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        localStorage.setItem("userId", user.uid); // ✅ Save session
-        result.innerHTML = "<span class='success-text'>Login successful! Redirecting...</span>";
+        console.log("✅ User logged in:", user.email);
 
-        setTimeout(() => {
+        // ✅ Fetch the user's saved level from Firestore
+        const playerRef = doc(db, "players", user.uid);
+        const playerSnap = await getDoc(playerRef);
+
+        if (playerSnap.exists()) {
+            const playerData = playerSnap.data();
+            const lastLevel = playerData.level || 2; // ✅ Default to Level 2 if no data found
+
+            console.log(`🔄 Redirecting player to Level ${lastLevel}...`);
+            result.innerHTML = `<span class='success-text'>Login successful! Redirecting to Level ${lastLevel}...</span>`;
+
+            setTimeout(() => {
+                window.location.href = `level.html?level=${lastLevel}`;
+            }, 2000);
+        } else {
+            console.warn("⚠ No player data found. Redirecting to Level 2...");
             window.location.href = "level.html?level=2";
-        }, 2000);
+        }
     } catch (error) {
         console.error("❌ Login failed:", error);
-        result.innerHTML = `<span style='color: red;'>Error: ${error.message}</span>`;
-    }
-});
-
-// 🔹 Forgot Password Feature
-document.getElementById("forgotPassword").addEventListener("click", async () => {
-    const email = document.getElementById("email").value.trim();
-    const result = document.getElementById("result");
-
-    if (!email) {
-        result.innerHTML = "<span style='color: red;'>Please enter your email to reset password.</span>";
-        return;
-    }
-
-    try {
-        await sendPasswordResetEmail(auth, email);
-        result.innerHTML = "<span style='color: green;'>Password reset email sent! Check your inbox.</span>";
-        console.log("📩 Password reset email sent successfully.");
-    } catch (error) {
-        console.error("❌ Password reset failed:", error);
         result.innerHTML = `<span style='color: red;'>Error: ${error.message}</span>`;
     }
 });
