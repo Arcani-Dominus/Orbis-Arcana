@@ -3,11 +3,12 @@ import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebase
 import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 document.getElementById("registerBtn").addEventListener("click", async () => {
+    const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
     const result = document.getElementById("result");
 
-    if (!email || !password) {
+    if (!name || !email || !password) {
         result.innerHTML = "<span style='color: red;'>Please enter all details.</span>";
         return;
     }
@@ -16,8 +17,9 @@ document.getElementById("registerBtn").addEventListener("click", async () => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // ✅ Store user in Firestore
+        // ✅ Save player data to Firestore
         await setDoc(doc(db, "players", user.uid), {
+            name: name,
             email: email,
             level: 2
         });
