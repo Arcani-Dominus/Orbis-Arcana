@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
 import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 document.getElementById("loginBtn").addEventListener("click", async () => {
@@ -18,7 +18,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
         console.log("✅ User logged in:", user.email);
 
-        // ✅ Fetch the user's saved level from Firestore
+        // ✅ Fetch the player's saved level from Firestore
         const playerRef = doc(db, "players", user.uid);
         const playerSnap = await getDoc(playerRef);
 
@@ -39,5 +39,21 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     } catch (error) {
         console.error("❌ Login failed:", error);
         result.innerHTML = `<span style='color: red;'>Error: ${error.message}</span>`;
+    }
+});
+
+// ✅ Ensure Users Stay Logged In & Redirect to Their Level
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        console.log("✅ User is already logged in:", user.email);
+
+        const playerRef = doc(db, "players", user.uid);
+        const playerSnap = await getDoc(playerRef);
+
+        if (playerSnap.exists()) {
+            const lastLevel = playerSnap.data().level || 2;
+            console.log(`🔄 Redirecting logged-in user to Level ${lastLevel}...`);
+            window.location.href = `level.html?level=${lastLevel}`;
+        }
     }
 });
