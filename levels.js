@@ -5,21 +5,19 @@ import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.
 // 🔥 Define Riddles & Answers
 const riddles = {
     2: "The more you take, the more you leave behind. What am I?",
-    3: "I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?",
-    4: "Follow Me!",
-    5: "Really?",
-    6: "OK",
-    7: "OK",
-    8: "OK"
+    3: ".. / .... ..- -- / -... ..- - / .... .- ...- . / -. --- / -- --- ..- - .... --..--  
+.. / -... .-. . .- - .... . / -... ..- - / .... .- ...- . / -. --- / .-.. ..- -. --. ... --..--  
+.-- .... . -. / -.. .- .-. -.- -. . ... ... / ..-. .- .-.. .-.. ... --..-- / .. / -.- . . .--. / - .... . / .-.. .. --. .... - ... / .- .-.. .. ...- . .-.-.-  
+.-- .... .- - / .- -- / .. ..--..  
+        Find Me!",
+    4: "Find Me!",
+    5: "I lead you up, I lead you down, Yet in my shadow, secrets are found.Not the front, but the hidden way,Find me where few choose to stay."
 };
 const answers = {
     2: "footsteps",
-    3: "shadow",
-    4: "arcana42",
-    5: "yes",
-    6: "ok",
-    7: "ok",
-    8: "ok"
+    3: "arcana42",
+    4: "ARBOR88",
+    5: "HIDDENSTEP33"
 };
 
 // ✅ Check If We Are on level.html Before Running the Script
