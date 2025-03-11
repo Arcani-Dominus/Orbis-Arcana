@@ -6,7 +6,7 @@ import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.
 const riddles = {
     2: "The more you take, the more you leave behind. What am I?",
     3: ".. / .... ..- -- / -... ..- - / .... .- ...- . / -. --- / -- --- ..- - .... --..--  \n .. / -... .-. . .- - .... . / -... ..- - / .... .- ...- . / -. --- / .-.. ..- -. --. ... --..-- \n .-- .... . -. / -.. .- .-. -.- -. . ... ... / ..-. .- .-.. .-.. ... --..-- / .. / -.- . . .--. / - .... . / .-.. .. --. .... - ... / .- .-.. .. ...- . .-.-.- \n .-- .... .- - / .- -- / .. ..--.. \n Find Answer Near Me!",
-    4: "Find Me!",
+    4: "Coordniates \n Find Me!",
     5: "I lead you up, I lead you down, Yet in my shadow, secrets are found.Not the front, but the hidden way, Find me where few choose to stay."
 };
 const answers = {
