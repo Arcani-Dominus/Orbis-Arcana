@@ -19,13 +19,15 @@ const riddles = {
     2: "The more you take, the more you leave behind. What am I?",
     3: "I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?",
     4: "Follow Me!",
-    5: "Really?"
+    5: "Really?",
+    6: "ok?"
 };
 const answers = {
     2: "footsteps",
     3: "shadow",
     4: "arcana42",
-    5: "yes"
+    5: "yes",
+    6: "ok"
 };
 
 // 🔹 Load Level & Riddle (With Error Prevention)
