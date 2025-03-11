@@ -1,3 +1,16 @@
+import { auth } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+
+// ✅ Check if user is logged in
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        console.warn("⚠️ User not logged in! Redirecting to login page...");
+        window.location.href = "login.html"; // ✅ Redirect to login
+    } else {
+        console.log("✅ User is logged in:", user.email);
+    }
+});
+
 import { db } from "./firebase-config.js";
 import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
@@ -6,22 +19,15 @@ const riddles = {
     2: "The more you take, the more you leave behind. What am I?",
     3: "I have no substance, yet I follow you close. I vanish in darkness but thrive in the glow. What am I?",
     4: "Follow Me!",
-    5: "Really?",
-    6: "OK",
-    7: "OK",
-    8: "OK"
+    5: "Really?"
 };
 const answers = {
     2: "footsteps",
     3: "shadow",
     4: "arcana42",
-    5: "yes",
-    6: "ok",
-    7: "ok",
-    8: "ok"
+    5: "yes"
 };
 
-// 🔹 Load Level & Riddle
 // 🔹 Load Level & Riddle (With Error Prevention)
 function loadLevel() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -39,23 +45,23 @@ function loadLevel() {
     }
 }
 
-
 // 🔹 Check Answer & Progress
 async function submitAnswer() {
-    const studentID = localStorage.getItem("studentID");
-    const feedback = document.getElementById("feedback"); // ✅ Define feedback first
+    const user = auth.currentUser; // ✅ Get logged-in user
+    const feedback = document.getElementById("feedback");
 
-    if (!studentID) {
-        feedback.innerHTML = "<span style='color: red;'>Error: You need to register first.</span>";
-        console.warn("⚠️ No student ID found in localStorage. Redirecting to register page...");
+    if (!user) {
+        feedback.innerHTML = "<span style='color: red;'>Error: You need to log in first.</span>";
+        console.warn("⚠️ No logged-in user found. Redirecting to login page...");
         setTimeout(() => {
-            window.location.href = "register.html"; // ✅ Redirect to register page
+            window.location.href = "login.html"; // ✅ Redirect to login page
         }, 2000);
         return;
     }
 
+    const studentID = user.uid; // ✅ Use Firebase Auth User ID instead of localStorage
     const urlParams = new URLSearchParams(window.location.search);
-    const level = parseInt(urlParams.get("level")) || 2; // ✅ Define level first
+    const level = parseInt(urlParams.get("level")) || 2;
 
     const answer = document.getElementById("answerInput").value.trim().toLowerCase();
     const correctAnswer = answers[level].toLowerCase(); // ✅ Normalize stored answer
@@ -93,9 +99,6 @@ async function submitAnswer() {
     }
 }
 
-
-    
-
 // 🔥 Attach Events on Page Load
 document.addEventListener("DOMContentLoaded", () => {
     loadLevel();
@@ -103,4 +106,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 export { riddles };
-
