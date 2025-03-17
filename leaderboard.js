@@ -3,7 +3,8 @@ import { collection, query, orderBy, limit, getDocs } from "https://www.gstatic.
 
 const leaderboardElement = document.getElementById("leaderboard");
 const leaderboardButton = document.getElementById("loadLeaderboardBtn");
-let leaderboardLoaded = false; // ✅ Prevents unnecessary API calls
+let leaderboardVisible = false; // ✅ Keeps track of visibility
+let leaderboardLoaded = false;  // ✅ Prevents multiple API calls
 
 async function loadLeaderboard() {
     console.log("📌 Fetching top 10 players...");
@@ -15,7 +16,7 @@ async function loadLeaderboard() {
 
     try {
         const leaderboardRef = collection(db, "players");
-        const q = query(leaderboardRef, orderBy("level", "desc"), orderBy("timestamp", "asc"), limit(10)); // ✅ Strictly limits to 10 players
+        const q = query(leaderboardRef, orderBy("level", "desc"), limit(10)); // ✅ Strictly limits to top 10 players
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
@@ -23,9 +24,9 @@ async function loadLeaderboard() {
             leaderboardElement.innerHTML = "<p>No players yet.</p>";
         } else {
             let leaderboardHTML = "<h3>🏆 Top 10 Players</h3><ol>";
-            let count = 0; // ✅ Manually limit results to 10, ensuring safety
+            let count = 0; // ✅ Extra safeguard
             snapshot.forEach((doc) => {
-                if (count < 10) { // ✅ Extra safeguard
+                if (count < 10) { // ✅ Prevents extra players from being added
                     const player = doc.data();
                     leaderboardHTML += `<li>#${count + 1} ${player.name} (Level ${player.level})</li>`;
                     count++;
@@ -36,7 +37,7 @@ async function loadLeaderboard() {
         }
 
         console.log("✅ Leaderboard updated successfully!");
-        leaderboardLoaded = true; // ✅ Mark as loaded to prevent unnecessary fetches
+        leaderboardLoaded = true;
 
     } catch (error) {
         console.error("❌ Error loading leaderboard:", error);
@@ -46,15 +47,10 @@ async function loadLeaderboard() {
 
 // 🔹 Toggle leaderboard visibility
 leaderboardButton.addEventListener("click", async () => {
-    if (leaderboardElement.style.display === "none" || leaderboardElement.classList.contains("hidden")) {
-        leaderboardElement.classList.remove("hidden");
-        leaderboardElement.style.display = "block"; // Show leaderboard
-
-        if (!leaderboardLoaded) {
-            await loadLeaderboard(); // ✅ Fetch only if not loaded before
-        }
-    } else {
-        leaderboardElement.classList.add("hidden");
-        leaderboardElement.style.display = "none"; // Hide leaderboard
+    if (!leaderboardLoaded) {
+        await loadLeaderboard(); // ✅ Fetch only if not loaded before
     }
+
+    leaderboardVisible = !leaderboardVisible; // ✅ Toggle state
+    leaderboardElement.style.display = leaderboardVisible ? "block" : "none"; // ✅ Show/Hide
 });
