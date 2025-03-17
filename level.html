@@ -125,7 +125,8 @@
                         return; // ❌ Skip invalid players
                     }
 
-                    leaderboardHTML += `<li>#${rank} ${playerName} - Level ${playerLevel}</li>`;
+                    leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
+
                     rank++;
                 });
 
