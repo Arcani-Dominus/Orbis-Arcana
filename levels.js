@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { getDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 export async function getRiddle(level) {
     try {
@@ -73,7 +73,12 @@ async function submitAnswer() {
         if (correctAnswer && answerInput === correctAnswer) {
             feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
             const playerRef = doc(db, "players", studentID);
-            await updateDoc(playerRef, { level: level + 1 });
+            
+            // ✅ Update level and timestamp in Firestore
+            await updateDoc(playerRef, { 
+                level: level + 1,
+                timestamp: serverTimestamp() // ✅ Auto-updates the timestamp
+            });
 
             setTimeout(() => {
                 window.location.href = `level.html?level=${level + 1}`;
