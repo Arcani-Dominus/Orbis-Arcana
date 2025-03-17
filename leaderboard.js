@@ -25,7 +25,11 @@ async function loadLeaderboard() {
         }
 
         let leaderboardHTML = "<h3>🏆 Top 10 Players</h3><ol>";
-        snapshot.forEach((doc, index) => {
+        let count = 0;
+
+        snapshot.forEach((doc) => {
+            if (count >= 10) return; // ✅ Ensure only 10 players are shown
+
             const player = doc.data();
 
             // ✅ Check if name and level are valid
@@ -34,11 +38,13 @@ async function loadLeaderboard() {
                 return; // ❌ Skip empty or invalid players
             }
 
-            leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
+            leaderboardHTML += `<li>#${count + 1} ${player.name} (Level ${player.level})</li>`;
+            count++;
         });
+
         leaderboardHTML += "</ol>";
 
-        if (leaderboardHTML === "<h3>🏆 Top 10 Players</h3><ol></ol>") {
+        if (count === 0) {
             leaderboardElement.innerHTML = "<p>No valid players found.</p>";
         } else {
             leaderboardElement.innerHTML = leaderboardHTML;
