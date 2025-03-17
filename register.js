@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { setDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 document.getElementById("registerBtn").addEventListener("click", async () => {
     const name = document.getElementById("name").value.trim();
@@ -17,11 +17,12 @@ document.getElementById("registerBtn").addEventListener("click", async () => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // ✅ Save player data to Firestore
+        // ✅ Save player data to Firestore with a timestamp
         await setDoc(doc(db, "players", user.uid), {
             name: name,
             email: email,
-            level: 2
+            level: 2,
+            timestamp: serverTimestamp() // ✅ Automatically set timestamp
         });
 
         localStorage.setItem("userId", user.uid); // ✅ Save session
