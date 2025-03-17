@@ -18,7 +18,7 @@
         <button id="submitAnswer" class="submit-button">Submit</button>
         <p id="feedback"></p>
 
-        <!-- 📢 Announcements Section (Only Message) -->
+        <!-- 📢 Announcements Section -->
         <p id="announcements">Loading announcements...</p>
 
         <!-- 🏆 Leaderboard Section -->
@@ -30,11 +30,9 @@
 
     <!-- ✅ JavaScript Code -->
     <script type="module">
-        import { db } from "./firebase-config.js";
-        import { getDoc, doc, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
-        import { getRiddle, getAnswer } from "./levels.js";
-        import { auth } from "./firebase-config.js";
-        import { updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { db, auth } from "./firebase-config.js";
+        import { getDoc, doc, collection, query, orderBy, getDocs, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { getRiddle, getAnswer, getAnnouncement } from "./levels.js";
 
         async function loadRiddle() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -86,6 +84,7 @@
             }
         }
 
+        // ✅ Updated loadLeaderboard Function
         async function loadLeaderboard() {
             try {
                 const leaderboardDiv = document.getElementById("leaderboard");
@@ -95,25 +94,29 @@
                 }
 
                 leaderboardDiv.innerHTML = "<p>Loading...</p>";
+
                 const leaderboardQuery = query(
                     collection(db, "players"),
-                    orderBy("level", "desc")
+                    orderBy("level", "desc"),
+                    orderBy("timestamp", "asc"),
+                    limit(10) // ✅ Show only top 10 players
                 );
+
                 const querySnapshot = await getDocs(leaderboardQuery);
 
-                if (querySnapshot.empty || querySnapshot.docs.length === 0) {
+                if (querySnapshot.empty) {
                     leaderboardDiv.innerHTML = "<p>No players found.</p>";
                     return;
                 }
 
                 let leaderboardHTML = "<ol>";
-                querySnapshot.forEach(doc => {
+                querySnapshot.forEach((doc, index) => {
                     const player = doc.data();
                     if (!player.name || player.level === undefined || player.level === null) {
                         console.warn("⚠ Skipping invalid player:", player);
                         return;
                     }
-                    leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
+                    leaderboardHTML += `<li>#${index + 1} ${player.name} - Level ${player.level}</li>`;
                 });
                 leaderboardHTML += "</ol>";
 
@@ -126,49 +129,42 @@
             }
         }
 
+        // ✅ Toggle Leaderboard Visibility
+        document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+            const leaderboardDiv = document.getElementById("leaderboard");
+
+            if (leaderboardDiv.style.display === "none" || leaderboardDiv.classList.contains("hidden")) {
+                loadLeaderboard(); // ✅ Load when shown
+                leaderboardDiv.classList.remove("hidden");
+                leaderboardDiv.style.display = "block";
+            } else {
+                leaderboardDiv.classList.add("hidden");
+                leaderboardDiv.style.display = "none"; // ✅ Hide leaderboard when clicked again
+            }
+        });
+
+        // ✅ Load Announcements on Page Load
+        async function loadAnnouncements() {
+            const announcementElement = document.getElementById("announcements");
+            if (!announcementElement) {
+                console.warn("⚠ Announcements element not found.");
+                return;
+            }
+            const announcementText = await getAnnouncement();
+            announcementElement.innerText = announcementText;
+        }
+
+        // ✅ Attach Events on Page Load
         document.addEventListener("DOMContentLoaded", () => {
             loadRiddle();
-            
+            loadAnnouncements();
+
             const submitButton = document.getElementById("submitAnswer");
             if (submitButton) {
                 submitButton.addEventListener("click", submitAnswer);
             }
-            
-            const leaderboardBtn = document.getElementById("loadLeaderboardBtn");
-            const leaderboardDiv = document.getElementById("leaderboard");
-
-            if (leaderboardBtn && leaderboardDiv) {
-                leaderboardBtn.addEventListener("click", () => {
-                    loadLeaderboard();
-                    setTimeout(() => {
-                        leaderboardDiv.classList.remove("hidden");
-                        leaderboardDiv.style.display = "block";
-                    }, 500);
-                });
-            } else {
-                console.warn("⚠ Leaderboard button or leaderboardDiv not found in HTML.");
-            }
         });
 
-       import { getAnnouncement } from "./levels.js";
-
-async function loadAnnouncements() {
-    const announcementElement = document.getElementById("announcements");
-
-    if (!announcementElement) {
-        console.warn("⚠ Announcements element not found.");
-        return;
-    }
-
-    const announcementText = await getAnnouncement();
-    announcementElement.innerText = announcementText;
-}
-
-// ✅ Load announcements on page load
-document.addEventListener("DOMContentLoaded", loadAnnouncements);
-
-
-        loadAnnouncements();
     </script>
 </body>
 </html>
