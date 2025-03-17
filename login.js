@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { getDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
 async function getRiddle(level) {
     try {
@@ -47,12 +47,24 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
             const riddle = await getRiddle(lastLevel);
             console.log(`🧩 Riddle for Level ${lastLevel}:`, riddle);
 
+            // ✅ Update timestamp when user logs in
+            await updateDoc(playerRef, {
+                lastLogin: serverTimestamp() // 🔥 Auto-updates login timestamp
+            });
+
             result.innerHTML = `<span class='success-text'>Login successful! Redirecting to Level ${lastLevel}...</span>`;
             setTimeout(() => {
                 window.location.href = `level.html?level=${lastLevel}`;
             }, 2000);
         } else {
             console.warn("⚠ No player data found. Redirecting to Level 2...");
+
+            // ✅ Create new player entry if not found
+            await updateDoc(playerRef, {
+                level: 2,
+                lastLogin: serverTimestamp()
+            });
+
             window.location.href = "level.html?level=2";
         }
     } catch (error) {
@@ -74,6 +86,11 @@ onAuthStateChanged(auth, async (user) => {
             console.log(`🔄 Fetching riddle for Level ${lastLevel}...`);
             const riddle = await getRiddle(lastLevel);
             console.log(`🧩 Riddle for Level ${lastLevel}:`, riddle);
+
+            // ✅ Update timestamp when user is already logged in
+            await updateDoc(playerRef, {
+                lastLogin: serverTimestamp()
+            });
 
             window.location.href = `level.html?level=${lastLevel}`;
         }
