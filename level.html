@@ -30,88 +30,145 @@
 
     <!-- ✅ JavaScript Code -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
-
-        // ✅ Import Firebase Config (Ensures `db` is available)
         import { db } from "./firebase-config.js";
-        import "./levels.js"; // ✅ Loads riddles & level system
+        import { getDoc, doc, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { getRiddle, getAnswer } from "./levels.js";
+        import { auth } from "./firebase-config.js";
+        import { updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-        
-        async function loadLeaderboard() {
-    try {
-        const leaderboardDiv = document.getElementById("leaderboard");
-        leaderboardDiv.innerHTML = "<p>Loading...</p>";
+        async function loadRiddle() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const level = parseInt(urlParams.get("level")) || 2;
 
-        const leaderboardQuery = query(
-            collection(db, "players"),
-            orderBy("level", "desc")
-        );
+            const riddleTextElement = document.getElementById("riddleText");
+            const levelTitleElement = document.getElementById("levelTitle");
 
-        const querySnapshot = await getDocs(leaderboardQuery);
-
-        console.log("📌 Firestore Data Loaded:", querySnapshot.docs.length, "records found.");
-
-        if (querySnapshot.empty || querySnapshot.docs.length === 0) {
-            console.warn("⚠ No players found in Firestore!");
-            leaderboardDiv.innerHTML = "<p>No players found.</p>";
-            return;
-        }
-
-        let leaderboardHTML = "<ol>";
-        querySnapshot.forEach(doc => {
-            const player = doc.data();
-            console.log("🔥 Firestore Player Data:", player); // ✅ Log full player data
-
-            if (!player.name || player.level === undefined || player.level === null) {
-                console.warn("⚠ Skipping invalid player:", player);
-                return; 
+            if (!riddleTextElement || !levelTitleElement) {
+                console.warn("⚠ Riddle elements not found in HTML.");
+                return;
             }
 
-            leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
-        });
-        leaderboardHTML += "</ol>";
-
-        if (leaderboardHTML === "<ol></ol>") {
-            leaderboardDiv.innerHTML = "<p>No players found.</p>";
-        } else {
-            leaderboardDiv.innerHTML = leaderboardHTML;
+            const riddleText = await getRiddle(level);
+            levelTitleElement.innerText = `Level ${level}`;
+            riddleTextElement.innerText = riddleText || "Riddle not found!";
         }
 
-        leaderboardDiv.classList.remove("hidden");
-        leaderboardDiv.style.display = "block";
-    } catch (error) {
-        console.error("❌ Error loading leaderboard:", error);
-        leaderboardDiv.innerHTML = "<p>Error loading leaderboard.</p>";
+        async function submitAnswer() {
+            const user = auth.currentUser;
+            const feedback = document.getElementById("feedback");
+
+            if (!user) {
+                feedback.innerHTML = "<span style='color: red;'>Error: You need to log in first.</span>";
+                return;
+            }
+
+            const studentID = user.uid;
+            const urlParams = new URLSearchParams(window.location.search);
+            const level = parseInt(urlParams.get("level")) || 2;
+            const answerInput = document.getElementById("answerInput").value.trim().toLowerCase();
+
+            try {
+                const correctAnswer = await getAnswer(level);
+                
+                if (correctAnswer && answerInput === correctAnswer) {
+                    feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
+                    const playerRef = doc(db, "players", studentID);
+                    await updateDoc(playerRef, { level: level + 1 });
+
+                    setTimeout(() => {
+                        window.location.href = `level.html?level=${level + 1}`;
+                    }, 2000);
+                } else {
+                    feedback.innerHTML = "<span style='color: red;'>Wrong answer! Try again.</span>";
+                }
+            } catch (error) {
+                console.error("❌ Error checking answer:", error);
+            }
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const leaderboardDiv = document.getElementById("leaderboard");
+                if (!leaderboardDiv) {
+                    console.error("❌ leaderboardDiv not found in HTML.");
+                    return;
+                }
+
+                leaderboardDiv.innerHTML = "<p>Loading...</p>";
+                const leaderboardQuery = query(
+                    collection(db, "players"),
+                    orderBy("level", "desc")
+                );
+                const querySnapshot = await getDocs(leaderboardQuery);
+
+                if (querySnapshot.empty || querySnapshot.docs.length === 0) {
+                    leaderboardDiv.innerHTML = "<p>No players found.</p>";
+                    return;
+                }
+
+                let leaderboardHTML = "<ol>";
+                querySnapshot.forEach(doc => {
+                    const player = doc.data();
+                    if (!player.name || player.level === undefined || player.level === null) {
+                        console.warn("⚠ Skipping invalid player:", player);
+                        return;
+                    }
+                    leaderboardHTML += `<li>${player.name} - Level ${player.level}</li>`;
+                });
+                leaderboardHTML += "</ol>";
+
+                leaderboardDiv.innerHTML = leaderboardHTML;
+                leaderboardDiv.classList.remove("hidden");
+                leaderboardDiv.style.display = "block";
+            } catch (error) {
+                console.error("❌ Error loading leaderboard:", error);
+                document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadRiddle();
+            
+            const submitButton = document.getElementById("submitAnswer");
+            if (submitButton) {
+                submitButton.addEventListener("click", submitAnswer);
+            }
+            
+            const leaderboardBtn = document.getElementById("loadLeaderboardBtn");
+            const leaderboardDiv = document.getElementById("leaderboard");
+
+            if (leaderboardBtn && leaderboardDiv) {
+                leaderboardBtn.addEventListener("click", () => {
+                    loadLeaderboard();
+                    setTimeout(() => {
+                        leaderboardDiv.classList.remove("hidden");
+                        leaderboardDiv.style.display = "block";
+                    }, 500);
+                });
+            } else {
+                console.warn("⚠ Leaderboard button or leaderboardDiv not found in HTML.");
+            }
+        });
+
+       import { getAnnouncement } from "./levels.js";
+
+async function loadAnnouncements() {
+    const announcementElement = document.getElementById("announcements");
+
+    if (!announcementElement) {
+        console.warn("⚠ Announcements element not found.");
+        return;
     }
+
+    const announcementText = await getAnnouncement();
+    announcementElement.innerText = announcementText;
 }
 
+// ✅ Load announcements on page load
+document.addEventListener("DOMContentLoaded", loadAnnouncements);
 
 
-        // ✅ Ensure button works correctly
-        document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-            loadLeaderboard(); // ✅ Load data first
-            setTimeout(() => {
-                document.getElementById("leaderboard").classList.remove("hidden");
-                document.getElementById("leaderboard").style.display = "block"; // ✅ Ensure visibility
-            }, 500); // ✅ Small delay to let data load
-        });
-
-        // 🔹 ANNOUNCEMENTS SYSTEM (Only Message)
-        async function loadAnnouncements() {
-            try {
-                let response = await fetch("announcements.json");
-                let data = await response.json();
-                document.getElementById("announcements").innerText = data.message;
-            } catch (error) {
-                console.error("❌ Error loading announcements:", error);
-                document.getElementById("announcements").innerText = "Failed to load announcements.";
-            }
-        }
-
-        // Load announcements on page load
         loadAnnouncements();
     </script>
-
 </body>
 </html>
