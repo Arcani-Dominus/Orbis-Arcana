@@ -21,13 +21,26 @@ async function loadLeaderboard() {
         if (snapshot.empty) {
             console.warn("⚠ No players found in Firestore.");
             leaderboardElement.innerHTML = "<p>No players yet.</p>";
+            return;
+        }
+
+        let leaderboardHTML = "<h3>🏆 Top 10 Players</h3><ol>";
+        snapshot.forEach((doc, index) => {
+            const player = doc.data();
+
+            // ✅ Check if name and level are valid
+            if (!player.name?.trim() || !player.level || isNaN(player.level)) {
+                console.warn("⚠ Skipping invalid player:", player);
+                return; // ❌ Skip empty or invalid players
+            }
+
+            leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
+        });
+        leaderboardHTML += "</ol>";
+
+        if (leaderboardHTML === "<h3>🏆 Top 10 Players</h3><ol></ol>") {
+            leaderboardElement.innerHTML = "<p>No valid players found.</p>";
         } else {
-            let leaderboardHTML = "<h3>🏆 Top 10 Players</h3><ol>";
-            snapshot.forEach((doc, index) => {
-                const player = doc.data();
-                leaderboardHTML += `<li>#${index + 1} ${player.name} (Level ${player.level})</li>`;
-            });
-            leaderboardHTML += "</ol>";
             leaderboardElement.innerHTML = leaderboardHTML;
         }
 
