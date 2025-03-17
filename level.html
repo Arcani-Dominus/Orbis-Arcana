@@ -31,7 +31,7 @@
     <!-- ✅ JavaScript Code -->
     <script type="module">
         import { db, auth } from "./firebase-config.js";
-        import { getDoc, doc, collection, query, orderBy, getDocs, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+        import { getDoc, doc, collection, query, orderBy, getDocs, updateDoc, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
         import { getRiddle, getAnswer, getAnnouncement } from "./levels.js";
 
         async function loadRiddle() {
@@ -71,7 +71,10 @@
                 if (correctAnswer && answerInput === correctAnswer) {
                     feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
                     const playerRef = doc(db, "players", studentID);
-                    await updateDoc(playerRef, { level: level + 1 });
+                    await updateDoc(playerRef, { 
+                        level: level + 1,
+                        timestamp: serverTimestamp() // ✅ Auto-add timestamp when updating level
+                    });
 
                     setTimeout(() => {
                         window.location.href = `level.html?level=${level + 1}`;
@@ -110,16 +113,23 @@
                 }
 
                 let leaderboardHTML = "<ol>";
-                querySnapshot.forEach((doc, index) => {
-                    const player = doc.data();
-                    if (!player.name || player.level === undefined || player.level === null) {
-                        console.warn("⚠ Skipping invalid player:", player);
-                        return;
-                    }
-                    leaderboardHTML += `<li>#${index + 1} ${player.name} - Level ${player.level}</li>`;
-                });
-                leaderboardHTML += "</ol>";
+                let rank = 1;
 
+                querySnapshot.forEach((doc) => {
+                    const player = doc.data();
+                    const playerName = player.name || "Unknown";
+                    const playerLevel = parseInt(player.level); // ✅ Ensure it's a number
+
+                    if (isNaN(playerLevel)) {
+                        console.warn(`⚠ Skipping invalid player entry:`, player);
+                        return; // ❌ Skip invalid players
+                    }
+
+                    leaderboardHTML += `<li>#${rank} ${playerName} - Level ${playerLevel}</li>`;
+                    rank++;
+                });
+
+                leaderboardHTML += "</ol>";
                 leaderboardDiv.innerHTML = leaderboardHTML;
                 leaderboardDiv.classList.remove("hidden");
                 leaderboardDiv.style.display = "block";
