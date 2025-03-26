@@ -1,6 +1,7 @@
 import { auth, db } from "./firebase-config.js";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
 import { getDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
 
 async function getRiddle(level) {
     try {
@@ -96,6 +97,27 @@ onAuthStateChanged(auth, async (user) => {
         }
     }
 });
+
+// ✅ Forgot Password Functionality
+document.getElementById("forgotPassword").addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    const email = prompt("Enter your email to reset the password:");
+    
+    if (!email) {
+        alert("❌ Please enter a valid email.");
+        return;
+    }
+
+    try {
+        await sendPasswordResetEmail(auth, email);
+        alert("✅ Password reset link sent! Check your email.");
+    } catch (error) {
+        console.error("❌ Failed to send reset email:", error);
+        alert(`❌ Error: ${error.message}`);
+    }
+});
+
 
 // ✅ Force reload to get latest data on mobile
 window.onload = function() {
