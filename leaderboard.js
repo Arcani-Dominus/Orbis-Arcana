@@ -15,7 +15,7 @@ async function loadLeaderboard() {
 
     try {
         const leaderboardRef = collection(db, "players");
-        const q = query(leaderboardRef, orderBy("level", "desc"), orderBy("timestamp", "asc"), limit(10)); // ✅ Strict limit to top 10
+        const q = query(leaderboardRef, orderBy("level", "desc"), orderBy("timestamp", "asc"), limit(3)); // ✅ Strict limit to top 10
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
@@ -28,7 +28,7 @@ async function loadLeaderboard() {
         let count = 0;
 
         snapshot.forEach((doc) => {
-            if (count >= 10) return; // ✅ Ensure only 10 players are shown
+            if (count >= 3) return; // ✅ Ensure only 10 players are shown
 
             const player = doc.data();
 
