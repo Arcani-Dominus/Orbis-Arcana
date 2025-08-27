@@ -18,6 +18,10 @@
         <button id="submitAnswer" class="submit-button">Submit</button>
         <p id="feedback"></p>
 
+        <!-- 💡 Hint Section -->
+        <button id="getHintBtn">Get Hint</button>
+        <p id="hintDisplay"></p>
+
         <!-- 📢 Announcements Section -->
         <p id="announcements">Loading announcements...</p>
 
@@ -73,7 +77,7 @@
                     const playerRef = doc(db, "players", studentID);
                     await updateDoc(playerRef, { 
                         level: level + 1,
-                        timestamp: serverTimestamp() // ✅ Auto-add timestamp when updating level
+                        timestamp: serverTimestamp()
                     });
 
                     setTimeout(() => {
@@ -84,6 +88,56 @@
                 }
             } catch (error) {
                 console.error("❌ Error checking answer:", error);
+            }
+        }
+
+        // 💡 Fetch and Show Hint (max 3 per player)
+        async function getHint() {
+            const user = auth.currentUser;
+            const hintDisplay = document.getElementById("hintDisplay");
+
+            if (!user) {
+                hintDisplay.innerText = "❌ You must be logged in to get a hint.";
+                return;
+            }
+
+            const studentID = user.uid;
+            const urlParams = new URLSearchParams(window.location.search);
+            const level = parseInt(urlParams.get("level")) || 2;
+
+            try {
+                const playerRef = doc(db, "players", studentID);
+                const playerSnap = await getDoc(playerRef);
+                let usedHints = 0;
+
+                if (playerSnap.exists()) {
+                    usedHints = playerSnap.data().hintsUsed || 0;
+                }
+
+                if (usedHints >= 3) {
+                    hintDisplay.innerText = "⚠️ You’ve used all 3 hints!";
+                    return;
+                }
+
+                const riddleRef = doc(db, "answers", level.toString());
+                const riddleSnap = await getDoc(riddleRef);
+
+                if (riddleSnap.exists()) {
+                    const hints = riddleSnap.data().hints || [];
+                    const nextHint = hints[usedHints];
+
+                    if (nextHint) {
+                        hintDisplay.innerText = `💡 Hint: ${nextHint}`;
+                        await updateDoc(playerRef, { hintsUsed: usedHints + 1 });
+                    } else {
+                        hintDisplay.innerText = "⚠️ No more hints available for this riddle.";
+                    }
+                } else {
+                    hintDisplay.innerText = "❌ Hint not found for this level.";
+                }
+            } catch (error) {
+                console.error("❌ Error fetching hint:", error);
+                hintDisplay.innerText = "Error loading hint.";
             }
         }
 
@@ -102,7 +156,7 @@
                     collection(db, "players"),
                     orderBy("level", "desc"),
                     orderBy("timestamp", "asc"),
-                    limit(10) // ✅ Show only top 10 players
+                    limit(10)
                 );
 
                 const querySnapshot = await getDocs(leaderboardQuery);
@@ -113,21 +167,14 @@
                 }
 
                 let leaderboardHTML = "<ol>";
-                let rank = 1;
-
                 querySnapshot.forEach((doc) => {
                     const player = doc.data();
                     const playerName = player.name || "Unknown";
-                    const playerLevel = parseInt(player.level); // ✅ Ensure it's a number
+                    const playerLevel = parseInt(player.level);
 
-                    if (isNaN(playerLevel)) {
-                        console.warn(`⚠ Skipping invalid player entry:`, player);
-                        return; // ❌ Skip invalid players
+                    if (!isNaN(playerLevel)) {
+                        leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
                     }
-
-                    leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
-
-                    rank++;
                 });
 
                 leaderboardHTML += "</ol>";
@@ -145,22 +192,19 @@
             const leaderboardDiv = document.getElementById("leaderboard");
 
             if (leaderboardDiv.style.display === "none" || leaderboardDiv.classList.contains("hidden")) {
-                loadLeaderboard(); // ✅ Load when shown
+                loadLeaderboard();
                 leaderboardDiv.classList.remove("hidden");
                 leaderboardDiv.style.display = "block";
             } else {
                 leaderboardDiv.classList.add("hidden");
-                leaderboardDiv.style.display = "none"; // ✅ Hide leaderboard when clicked again
+                leaderboardDiv.style.display = "none";
             }
         });
 
         // ✅ Load Announcements on Page Load
         async function loadAnnouncements() {
             const announcementElement = document.getElementById("announcements");
-            if (!announcementElement) {
-                console.warn("⚠ Announcements element not found.");
-                return;
-            }
+            if (!announcementElement) return;
             const announcementText = await getAnnouncement();
             announcementElement.innerText = announcementText;
         }
@@ -171,12 +215,11 @@
             loadAnnouncements();
 
             const submitButton = document.getElementById("submitAnswer");
-            if (submitButton) {
-                submitButton.addEventListener("click", submitAnswer);
-            }
+            if (submitButton) submitButton.addEventListener("click", submitAnswer);
+
+            const hintButton = document.getElementById("getHintBtn");
+            if (hintButton) hintButton.addEventListener("click", getHint);
         });
-<button id="getHintBtn">Get Hint</button>
-<p id="hintDisplay"></p>
     </script>
 </body>
 </html>
