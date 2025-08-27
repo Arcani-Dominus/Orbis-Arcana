@@ -1,76 +1,82 @@
-import { db, auth } from "./firebase-config.js";
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  setDoc,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// hints.js
+import { auth, db } from "./firebase-config.js";
+import { getDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-// UI Elements
-const hintButton = document.getElementById("hint-button");
-const hintContainer = document.getElementById("hint-container");
+// ✅ Function to fetch and show hint for the current level
+async function getHint() {
+    const user = auth.currentUser;
+    const hintDisplay = document.getElementById("hintDisplay");
 
-// Listen for auth state
-auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      // If user doc doesn’t exist, create it
-      await setDoc(userRef, {
-        totalHintsUsed: 0,
-        usedHints: {} // to track per level
-      });
+    if (!user) {
+        hintDisplay.innerText = "❌ You must be logged in to get a hint.";
+        return;
     }
 
-    // Attach button click handler
-    hintButton.addEventListener("click", async () => {
-      const updatedSnap = await getDoc(userRef);
-      const userData = updatedSnap.data();
+    const urlParams = new URLSearchParams(window.location.search);
+    const level = parseInt(urlParams.get("level")) || 1;
+    const playerRef = doc(db, "players", user.uid);
 
-      const totalHintsUsed = userData.totalHintsUsed || 0;
-      const usedHints = userData.usedHints || {};
+    try {
+        const playerSnap = await getDoc(playerRef);
+        let usedHints = 0;
+        let unlockedHints = {};
 
-      // Get current level (from localStorage or however your app stores it)
-      const currentLevel = localStorage.getItem("currentLevel");
+        if (playerSnap.exists()) {
+            usedHints = playerSnap.data().hintsUsed || 0;
+            unlockedHints = playerSnap.data().hintsUnlocked || {};
+        }
 
-      // Case 1: Already reached total limit
-      if (totalHintsUsed >= 3) {
-        hintContainer.textContent = "❌ You have used all 3 hints for the game.";
-        hintButton.disabled = true;
-        return;
-      }
+        if (usedHints >= 3) {
+            hintDisplay.innerText = "⚠️ You’ve used all 3 hints!";
+            document.getElementById("getHintBtn").disabled = true;
+            return;
+        }
 
-      // Case 2: Already used a hint for this level
-      if (usedHints[currentLevel]) {
-        hintContainer.textContent = "⚠️ You already used a hint for this level.";
-        hintButton.disabled = true;
-        return;
-      }
+        if (unlockedHints[level]) {
+            // Already unlocked: just show it
+            const riddleRef = doc(db, "answers", level.toString());
+            const riddleSnap = await getDoc(riddleRef);
+            if (riddleSnap.exists()) {
+                const hints = riddleSnap.data().hints || [];
+                hintDisplay.innerText = `💡 Hint: ${hints[0] || "No hint available"}`;
+            }
+            return;
+        }
 
-      // ✅ Fetch the hint for this level
-      const hintRef = doc(db, "hints", currentLevel);
-      const hintSnap = await getDoc(hintRef);
+        // Unlock hint for this level
+        const riddleRef = doc(db, "answers", level.toString());
+        const riddleSnap = await getDoc(riddleRef);
+        if (!riddleSnap.exists()) {
+            hintDisplay.innerText = "⚠️ No hint found for this level.";
+            return;
+        }
 
-      if (hintSnap.exists()) {
-        const hintData = hintSnap.data();
-        const hintText = hintData.text;
+        const hints = riddleSnap.data().hints || [];
+        if (hints.length === 0) {
+            hintDisplay.innerText = "⚠️ No hints set for this riddle.";
+            return;
+        }
 
-        // Show the hint
-        hintContainer.textContent = `💡 Hint: ${hintText}`;
+        const hint = hints[0];
+        hintDisplay.innerText = `💡 Hint: ${hint}`;
 
-        // Update Firestore → increment totalHintsUsed, mark this level as used
-        await updateDoc(userRef, {
-          totalHintsUsed: totalHintsUsed + 1,
-          [`usedHints.${currentLevel}`]: true
+        // Update Firestore: consume one global hint and mark this level as unlocked
+        await updateDoc(playerRef, {
+            hintsUsed: usedHints + 1,
+            [`hintsUnlocked.${level}`]: true
         });
 
-        // Disable button for this level
-        hintButton.disabled = true;
-      } else {
-        hintContainer.textContent = "❌ No hint available for this level.";
-      }
-    });
-  }
-});
+        // Disable button if all hints used
+        if (usedHints + 1 >= 3) {
+            document.getElementById("getHintBtn").disabled = true;
+            hintDisplay.innerText += " (⚠️ All hints used!)";
+        }
+
+    } catch (error) {
+        console.error("❌ Error fetching hint:", error);
+        hintDisplay.innerText = "Error loading hint.";
+    }
+}
+
+// ✅ Export function so level.html can import it
+export { getHint };
