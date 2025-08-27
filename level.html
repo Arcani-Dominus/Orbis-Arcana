@@ -21,7 +21,6 @@
         <!-- 💡 Hint Section -->
         <button id="getHintBtn">Get Hint</button>
         <p id="hintDisplay"></p>
-        <p id="hintCounter"></p>
 
         <!-- 📢 Announcements Section -->
         <p id="announcements">Loading announcements...</p>
@@ -33,123 +32,103 @@
         </div>
     </div>
 
-    <!-- ✅ JavaScript Code -->
     <script type="module">
         import { db, auth } from "./firebase-config.js";
         import { getDoc, doc, collection, query, orderBy, getDocs, updateDoc, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
-        import { getRiddle, getAnswer, getAnnouncement, getHint } from "./levels.js"; // ✅ Import getHint from levels.js
+        import { getRiddle, getAnswer, getAnnouncement } from "./levels.js";
+        import { getHint } from "./hints.js"; // ✅ Using your hints.js
 
-        async function loadRiddle() {
+        document.addEventListener("DOMContentLoaded", async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const level = parseInt(urlParams.get("level")) || 1;
 
-            document.getElementById("levelTitle").innerText = `Level ${level}`;
-            document.getElementById("riddleText").innerText = await getRiddle(level) || "Riddle not found!";
-        }
-
-        async function submitAnswer() {
-            const user = auth.currentUser;
+            const riddleText = document.getElementById("riddleText");
+            const levelTitle = document.getElementById("levelTitle");
             const feedback = document.getElementById("feedback");
+            const answerInput = document.getElementById("answerInput");
 
-            if (!user) {
-                feedback.innerHTML = "<span style='color: red;'>Error: You need to log in first.</span>";
-                return;
-            }
+            levelTitle.innerText = `Level ${level}`;
 
-            const studentID = user.uid;
-            const urlParams = new URLSearchParams(window.location.search);
-            const level = parseInt(urlParams.get("level")) || 1;
-            const answerInput = document.getElementById("answerInput").value.trim().toLowerCase();
+            // ✅ Load riddle
+            const riddle = await getRiddle(level);
+            riddleText.innerText = riddle || "Riddle not found!";
 
-            try {
+            // ✅ Load announcements
+            const announcements = await getAnnouncement();
+            document.getElementById("announcements").innerText = announcements;
+
+            // ✅ Submit answer
+            document.getElementById("submitAnswer").addEventListener("click", async () => {
+                const user = auth.currentUser;
+                if (!user) {
+                    feedback.innerHTML = "<span style='color: red;'>Error: You need to log in first.</span>";
+                    return;
+                }
+                const studentID = user.uid;
+                const answer = answerInput.value.trim().toLowerCase();
                 const correctAnswer = await getAnswer(level);
-                
-                if (correctAnswer && answerInput === correctAnswer) {
+
+                if (answer && correctAnswer && answer === correctAnswer) {
                     feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
                     const playerRef = doc(db, "players", studentID);
                     await updateDoc(playerRef, { 
                         level: level + 1,
                         timestamp: serverTimestamp()
                     });
-
                     setTimeout(() => {
                         window.location.href = `level.html?level=${level + 1}`;
                     }, 2000);
                 } else {
                     feedback.innerHTML = "<span style='color: red;'>Wrong answer! Try again.</span>";
                 }
-            } catch (error) {
-                console.error("❌ Error checking answer:", error);
-            }
-        }
+            });
 
-        // ✅ Load Leaderboard
-        async function loadLeaderboard() {
-            try {
-                const leaderboardDiv = document.getElementById("leaderboard");
-                leaderboardDiv.innerHTML = "<p>Loading...</p>";
+            // ✅ Hint button
+            document.getElementById("getHintBtn").addEventListener("click", async () => {
+                await getHint(level); // hints.js handles DOM update
+            });
 
-                const leaderboardQuery = query(
-                    collection(db, "players"),
-                    orderBy("level", "desc"),
-                    orderBy("timestamp", "asc"),
-                    limit(10)
-                );
+            // ✅ Leaderboard
+            async function loadLeaderboard() {
+                try {
+                    const leaderboardDiv = document.getElementById("leaderboard");
+                    leaderboardDiv.innerHTML = "<p>Loading...</p>";
 
-                const querySnapshot = await getDocs(leaderboardQuery);
+                    const leaderboardQuery = query(
+                        collection(db, "players"),
+                        orderBy("level", "desc"),
+                        orderBy("timestamp", "asc"),
+                        limit(10)
+                    );
+                    const querySnapshot = await getDocs(leaderboardQuery);
+                    if (querySnapshot.empty) {
+                        leaderboardDiv.innerHTML = "<p>No players found.</p>";
+                        return;
+                    }
 
-                if (querySnapshot.empty) {
-                    leaderboardDiv.innerHTML = "<p>No players found.</p>";
-                    return;
+                    let leaderboardHTML = "<ol>";
+                    querySnapshot.forEach(doc => {
+                        const player = doc.data();
+                        leaderboardHTML += `<li>${player.name || "Unknown"} - Level ${player.level}</li>`;
+                    });
+                    leaderboardHTML += "</ol>";
+                    leaderboardDiv.innerHTML = leaderboardHTML;
+                    leaderboardDiv.classList.remove("hidden");
+                    leaderboardDiv.style.display = "block";
+                } catch (error) {
+                    console.error("Error loading leaderboard:", error);
+                    document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
                 }
-
-                let leaderboardHTML = "<ol>";
-                querySnapshot.forEach((doc) => {
-                    const player = doc.data();
-                    leaderboardHTML += `<li>${player.name || "Unknown"} - Level ${player.level}</li>`;
-                });
-                leaderboardHTML += "</ol>";
-
-                leaderboardDiv.innerHTML = leaderboardHTML;
-                leaderboardDiv.classList.remove("hidden");
-                leaderboardDiv.style.display = "block";
-            } catch (error) {
-                console.error("❌ Error loading leaderboard:", error);
-                document.getElementById("leaderboard").innerHTML = "<p>Error loading leaderboard.</p>";
             }
-        }
 
-        // ✅ Toggle Leaderboard
-        document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
-            const leaderboardDiv = document.getElementById("leaderboard");
-
-            if (leaderboardDiv.style.display === "none" || leaderboardDiv.classList.contains("hidden")) {
-                loadLeaderboard();
-                leaderboardDiv.classList.remove("hidden");
-                leaderboardDiv.style.display = "block";
-            } else {
-                leaderboardDiv.classList.add("hidden");
-                leaderboardDiv.style.display = "none";
-            }
-        });
-
-        // ✅ Load Announcements
-        async function loadAnnouncements() {
-            document.getElementById("announcements").innerText = await getAnnouncement();
-        }
-
-        // ✅ On Page Load
-        document.addEventListener("DOMContentLoaded", () => {
-            loadRiddle();
-            loadAnnouncements();
-
-            document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
-
-            // ✅ Hint Button Integration
-            document.getElementById("getHintBtn").addEventListener("click", () => {
-                const urlParams = new URLSearchParams(window.location.search);
-                const level = parseInt(urlParams.get("level")) || 1;
-                getHint(level);
+            document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
+                const leaderboardDiv = document.getElementById("leaderboard");
+                if (leaderboardDiv.style.display === "none" || leaderboardDiv.classList.contains("hidden")) {
+                    loadLeaderboard();
+                } else {
+                    leaderboardDiv.classList.add("hidden");
+                    leaderboardDiv.style.display = "none";
+                }
             });
         });
     </script>
