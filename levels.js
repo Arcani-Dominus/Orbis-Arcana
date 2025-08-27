@@ -53,49 +53,11 @@ export async function getAnnouncement() {
     }
 }
 
-async function submitAnswer() {
-    const user = auth.currentUser;
-    const feedback = document.getElementById("feedback");
-
-    if (!user) {
-        feedback.innerHTML = "<span style='color: red;'>Error: You need to log in first.</span>";
-        return;
-    }
-
-    const studentID = user.uid;
-    const urlParams = new URLSearchParams(window.location.search);
-    const level = parseInt(urlParams.get("level")) || 2;
-    const answerInput = document.getElementById("answerInput").value.trim().toLowerCase();
-
-    try {
-        const correctAnswer = await getAnswer(level);
-        
-        if (correctAnswer && answerInput === correctAnswer) {
-            feedback.innerHTML = "<span class='success-text'>Correct! Proceeding to next level...</span>";
-            const playerRef = doc(db, "players", studentID);
-            
-            // ✅ Update level and timestamp in Firestore
-            await updateDoc(playerRef, { 
-                level: level + 1,
-                timestamp: serverTimestamp() // ✅ Auto-updates the timestamp
-            });
-
-            setTimeout(() => {
-                window.location.href = `level.html?level=${level + 1}`;
-            }, 2000);
-        } else {
-            feedback.innerHTML = "<span style='color: red;'>Wrong answer! Try again.</span>";
-        }
-    } catch (error) {
-        console.error("❌ Error checking answer:", error);
-    }
-}
-
-// ✅ Get a hint for the current level
-async function getHint(level) {
+// ✅ Get a hint for the current level (max 3 across entire game)
+export async function getHint(level) {
     const user = auth.currentUser;
     if (!user) {
-        alert("You must be logged in to use hints.");
+        document.getElementById("hintDisplay").innerText = "❌ You must be logged in to use hints.";
         return;
     }
 
@@ -103,46 +65,54 @@ async function getHint(level) {
     const playerSnap = await getDoc(playerRef);
 
     if (!playerSnap.exists()) return;
-    const playerData = playerSnap.data();
 
+    const playerData = playerSnap.data();
     let totalHintsUsed = playerData.hintsUsed || 0;
+    let unlockedHints = playerData.hintsUnlocked || {}; // { "2": true, "3": true }
+
+    // 🚨 Check global limit
     if (totalHintsUsed >= 3) {
         document.getElementById("hintDisplay").innerText = "⚠️ You have used all 3 hints!";
         return;
     }
 
-    // Check how many hints already unlocked for this level
-    const hintsUnlocked = playerData.hintsUnlocked || {};
-    const usedForThisLevel = hintsUnlocked[level] || 0;
+    // 🚨 Check if already unlocked for this level
+    if (unlockedHints[level]) {
+        // Just re-show the hint, don’t consume a new one
+        const levelRef = doc(db, "answers", level.toString());
+        const levelSnap = await getDoc(levelRef);
+        if (levelSnap.exists()) {
+            const hints = levelSnap.data().hints || [];
+            document.getElementById("hintDisplay").innerText = `💡 Hint: ${hints[0] || "No hint available"}`;
+        }
+        return;
+    }
 
-    // Get hints from Firestore
+    // ✅ Otherwise, unlock hint for this level
     const levelRef = doc(db, "answers", level.toString());
     const levelSnap = await getDoc(levelRef);
 
     if (!levelSnap.exists()) {
-        document.getElementById("hintDisplay").innerText = "⚠️ No hints found for this level.";
+        document.getElementById("hintDisplay").innerText = "⚠️ No hint found for this level.";
         return;
     }
 
-    const levelData = levelSnap.data();
-    const hints = levelData.hints || [];
-
-    if (usedForThisLevel >= hints.length) {
-        document.getElementById("hintDisplay").innerText = "⚠️ No more hints available for this level.";
+    const hints = levelSnap.data().hints || [];
+    if (hints.length === 0) {
+        document.getElementById("hintDisplay").innerText = "⚠️ No hints set for this riddle.";
         return;
     }
 
-    // Get next hint
-    const hint = hints[usedForThisLevel];
+    const hint = hints[0]; // 👈 Only 1 hint per level
+    document.getElementById("hintDisplay").innerText = `💡 Hint: ${hint}`;
 
-    // Update Firestore
+    // Update Firestore: consume 1 global hint + mark unlocked for this level
     await updateDoc(playerRef, {
         hintsUsed: totalHintsUsed + 1,
-        [`hintsUnlocked.${level}`]: usedForThisLevel + 1
+        [`hintsUnlocked.${level}`]: true
     });
 
-    // Show hint + counter
-    document.getElementById("hintDisplay").innerText = hint;
+    // Update counter in UI
     document.getElementById("hintCounter").innerText = `Hints used: ${totalHintsUsed + 1}/3`;
 }
 
@@ -174,31 +144,3 @@ onAuthStateChanged(auth, async (user) => {
         }
     }
 });
-
-// ✅ Attach Submit Button Event
-document.addEventListener("DOMContentLoaded", async () => {
-    const submitButton = document.getElementById("submitAnswer");
-    if (submitButton) {
-        submitButton.addEventListener("click", submitAnswer);
-    } else {
-        console.warn("⚠ Submit button not found in HTML.");
-    }
-
-    // ✅ Load Announcements
-    const announcementElement = document.getElementById("announcements");
-    if (announcementElement) {
-        const announcementText = await getAnnouncement();
-        announcementElement.innerText = announcementText;
-    }
-});
-
-// ✅ Force reload to get latest data on mobile
-window.onload = function() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-            registrations.forEach(registration => {
-                registration.unregister();
-            });
-        });
-    }
-};
