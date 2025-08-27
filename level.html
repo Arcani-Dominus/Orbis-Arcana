@@ -21,6 +21,7 @@
         <!-- 💡 Hint Section -->
         <button id="getHintBtn">Get Hint</button>
         <p id="hintDisplay"></p>
+        <p id="hintCounter"></p>
 
         <!-- 📢 Announcements Section -->
         <p id="announcements">Loading announcements...</p>
@@ -36,8 +37,7 @@
     <script type="module">
         import { db, auth } from "./firebase-config.js";
         import { getDoc, doc, collection, query, orderBy, getDocs, updateDoc, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
-        import { getRiddle, getAnswer, getAnnouncement } from "./levels.js";
-        import { getHint } from "./hints.js";   <!-- ✅ Importing from hints.js -->
+        import { getRiddle, getAnswer, getAnnouncement, getHint } from "./levels.js"; // ✅ Import getHint from levels.js
 
         async function loadRiddle() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -144,7 +144,13 @@
             loadAnnouncements();
 
             document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
-            document.getElementById("getHintBtn").addEventListener("click", () => getHint()); <!-- ✅ Hook to hints.js -->
+
+            // ✅ Hint Button Integration
+            document.getElementById("getHintBtn").addEventListener("click", () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const level = parseInt(urlParams.get("level")) || 1;
+                getHint(level);
+            });
         });
     </script>
 </body>
