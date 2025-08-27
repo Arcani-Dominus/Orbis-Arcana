@@ -40,19 +40,10 @@
 
         async function loadRiddle() {
             const urlParams = new URLSearchParams(window.location.search);
-            const level = parseInt(urlParams.get("level")) || 2;
+            const level = parseInt(urlParams.get("level")) || 1;
 
-            const riddleTextElement = document.getElementById("riddleText");
-            const levelTitleElement = document.getElementById("levelTitle");
-
-            if (!riddleTextElement || !levelTitleElement) {
-                console.warn("⚠ Riddle elements not found in HTML.");
-                return;
-            }
-
-            const riddleText = await getRiddle(level);
-            levelTitleElement.innerText = `Level ${level}`;
-            riddleTextElement.innerText = riddleText || "Riddle not found!";
+            document.getElementById("levelTitle").innerText = `Level ${level}`;
+            document.getElementById("riddleText").innerText = await getRiddle(level) || "Riddle not found!";
         }
 
         async function submitAnswer() {
@@ -66,7 +57,7 @@
 
             const studentID = user.uid;
             const urlParams = new URLSearchParams(window.location.search);
-            const level = parseInt(urlParams.get("level")) || 2;
+            const level = parseInt(urlParams.get("level")) || 1;
             const answerInput = document.getElementById("answerInput").value.trim().toLowerCase();
 
             try {
@@ -91,7 +82,7 @@
             }
         }
 
-        // 💡 Fetch and Show Hint (max 3 per player)
+        // 💡 Fetch and Show Hint (max 3 per player across all levels)
         async function getHint() {
             const user = auth.currentUser;
             const hintDisplay = document.getElementById("hintDisplay");
@@ -103,7 +94,7 @@
 
             const studentID = user.uid;
             const urlParams = new URLSearchParams(window.location.search);
-            const level = parseInt(urlParams.get("level")) || 2;
+            const level = parseInt(urlParams.get("level")) || 1;
 
             try {
                 const playerRef = doc(db, "players", studentID);
@@ -116,6 +107,7 @@
 
                 if (usedHints >= 3) {
                     hintDisplay.innerText = "⚠️ You’ve used all 3 hints!";
+                    document.getElementById("getHintBtn").disabled = true;
                     return;
                 }
 
@@ -123,14 +115,22 @@
                 const riddleSnap = await getDoc(riddleRef);
 
                 if (riddleSnap.exists()) {
-                    const hints = riddleSnap.data().hints || [];
-                    const nextHint = hints[usedHints];
+                    const hint = riddleSnap.data().hint; // ✅ single hint per riddle
 
-                    if (nextHint) {
-                        hintDisplay.innerText = `💡 Hint: ${nextHint}`;
-                        await updateDoc(playerRef, { hintsUsed: usedHints + 1 });
+                    if (hint) {
+                        if (!hintDisplay.innerText) {
+                            // First time showing this level's hint → count it
+                            await updateDoc(playerRef, { hintsUsed: usedHints + 1 });
+                        }
+                        hintDisplay.innerText = `💡 Hint: ${hint}`;
+
+                        // If this was the last available hint
+                        if (usedHints + 1 >= 3) {
+                            document.getElementById("getHintBtn").disabled = true;
+                            hintDisplay.innerText += " (⚠️ All hints used!)";
+                        }
                     } else {
-                        hintDisplay.innerText = "⚠️ No more hints available for this riddle.";
+                        hintDisplay.innerText = "⚠️ No hint available for this riddle.";
                     }
                 } else {
                     hintDisplay.innerText = "❌ Hint not found for this level.";
@@ -141,15 +141,10 @@
             }
         }
 
-        // ✅ Updated loadLeaderboard Function
+        // ✅ Load Leaderboard
         async function loadLeaderboard() {
             try {
                 const leaderboardDiv = document.getElementById("leaderboard");
-                if (!leaderboardDiv) {
-                    console.error("❌ leaderboardDiv not found in HTML.");
-                    return;
-                }
-
                 leaderboardDiv.innerHTML = "<p>Loading...</p>";
 
                 const leaderboardQuery = query(
@@ -169,15 +164,10 @@
                 let leaderboardHTML = "<ol>";
                 querySnapshot.forEach((doc) => {
                     const player = doc.data();
-                    const playerName = player.name || "Unknown";
-                    const playerLevel = parseInt(player.level);
-
-                    if (!isNaN(playerLevel)) {
-                        leaderboardHTML += `<li>${playerName} - Level ${playerLevel}</li>`;
-                    }
+                    leaderboardHTML += `<li>${player.name || "Unknown"} - Level ${player.level}</li>`;
                 });
-
                 leaderboardHTML += "</ol>";
+
                 leaderboardDiv.innerHTML = leaderboardHTML;
                 leaderboardDiv.classList.remove("hidden");
                 leaderboardDiv.style.display = "block";
@@ -187,7 +177,7 @@
             }
         }
 
-        // ✅ Toggle Leaderboard Visibility
+        // ✅ Toggle Leaderboard
         document.getElementById("loadLeaderboardBtn").addEventListener("click", () => {
             const leaderboardDiv = document.getElementById("leaderboard");
 
@@ -201,24 +191,18 @@
             }
         });
 
-        // ✅ Load Announcements on Page Load
+        // ✅ Load Announcements
         async function loadAnnouncements() {
-            const announcementElement = document.getElementById("announcements");
-            if (!announcementElement) return;
-            const announcementText = await getAnnouncement();
-            announcementElement.innerText = announcementText;
+            document.getElementById("announcements").innerText = await getAnnouncement();
         }
 
-        // ✅ Attach Events on Page Load
+        // ✅ On Page Load
         document.addEventListener("DOMContentLoaded", () => {
             loadRiddle();
             loadAnnouncements();
 
-            const submitButton = document.getElementById("submitAnswer");
-            if (submitButton) submitButton.addEventListener("click", submitAnswer);
-
-            const hintButton = document.getElementById("getHintBtn");
-            if (hintButton) hintButton.addEventListener("click", getHint);
+            document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
+            document.getElementById("getHintBtn").addEventListener("click", getHint);
         });
     </script>
 </body>
