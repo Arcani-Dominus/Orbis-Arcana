@@ -1,146 +1,104 @@
+// levels.js
+
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-import { getDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  increment,
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-export async function getRiddle(level) {
-    try {
-        const levelRef = doc(db, "answers", level.toString());
-        const levelSnap = await getDoc(levelRef);
+// Elements
+const levelNumberEl = document.getElementById("level-number");
+const riddleTextEl = document.getElementById("riddle-text");
+const answerInput = document.getElementById("answer");
+const submitBtn = document.getElementById("submit-answer");
+const feedbackEl = document.getElementById("feedback");
 
-        if (levelSnap.exists()) {
-            return levelSnap.data().riddle;
-        } else {
-            console.warn(`⚠️ No riddle found for Level ${level}`);
-            return null;
-        }
-    } catch (error) {
-        console.error("❌ Firestore error while fetching riddle:", error);
-        return null;
-    }
+// Load the current level for the logged-in user
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    const userData = userSnap.data();
+    const currentLevel = userData.currentLevel || 1;
+    loadLevel(currentLevel);
+  } else {
+    // If new user, initialize
+    await setDoc(userRef, {
+      currentLevel: 1,
+      hintsUsed: {},
+      score: 0,
+    });
+    loadLevel(1);
+  }
+});
+
+// Function to load level content
+async function loadLevel(levelNumber) {
+  const levelRef = doc(db, "levels", `level${levelNumber}`);
+  const levelSnap = await getDoc(levelRef);
+
+  if (levelSnap.exists()) {
+    const levelData = levelSnap.data();
+    levelNumberEl.textContent = `Level ${levelNumber}`;
+    riddleTextEl.textContent = levelData.riddle || "No riddle found!";
+    feedbackEl.textContent = "";
+  } else {
+    levelNumberEl.textContent = "🎉 Congratulations!";
+    riddleTextEl.textContent = "You have completed all levels!";
+    submitBtn.style.display = "none";
+    answerInput.style.display = "none";
+  }
 }
 
-export async function getAnswer(level) {
-    try {
-        const levelRef = doc(db, "answers", level.toString());
-        const levelSnap = await getDoc(levelRef);
+// Handle answer submission
+submitBtn.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) return;
 
-        if (levelSnap.exists()) {
-            return levelSnap.data().answer.toLowerCase();
-        } else {
-            console.warn(`⚠️ No answer found for Level ${level}`);
-            return null;
-        }
-    } catch (error) {
-        console.error("❌ Firestore error while fetching answer:", error);
-        return null;
-    }
-}
+  const answer = answerInput.value.trim().toLowerCase();
+  if (!answer) {
+    feedbackEl.textContent = "⚠️ Please enter an answer.";
+    return;
+  }
 
-export async function getAnnouncement() {
-    try {
-        const announcementRef = doc(db, "announcements", "latest");
-        const announcementSnap = await getDoc(announcementRef);
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
 
-        if (announcementSnap.exists()) {
-            return announcementSnap.data().message;
-        } else {
-            console.warn("⚠️ No announcement found in Firestore.");
-            return "No announcements available.";
-        }
-    } catch (error) {
-        console.error("❌ Firestore error while fetching announcement:", error);
-        return "Error loading announcements.";
-    }
-}
+  if (!userSnap.exists()) return;
+  const userData = userSnap.data();
+  const currentLevel = userData.currentLevel || 1;
 
-// ✅ Get a hint for the current level (max 3 across entire game)
-export async function getHint(level) {
-    const user = auth.currentUser;
-    if (!user) {
-        document.getElementById("hintDisplay").innerText = "❌ You must be logged in to use hints.";
-        return;
-    }
+  const levelRef = doc(db, "levels", `level${currentLevel}`);
+  const levelSnap = await getDoc(levelRef);
 
-    const playerRef = doc(db, "players", user.uid);
-    const playerSnap = await getDoc(playerRef);
+  if (!levelSnap.exists()) return;
+  const levelData = levelSnap.data();
 
-    if (!playerSnap.exists()) return;
+  // Validate answer
+  if (levelData.answer && answer === levelData.answer.toLowerCase()) {
+    feedbackEl.textContent = "✅ Correct! Proceeding to next level...";
+    answerInput.value = "";
 
-    const playerData = playerSnap.data();
-    let totalHintsUsed = playerData.hintsUsed || 0;
-    let unlockedHints = playerData.hintsUnlocked || {}; // { "2": true, "3": true }
-
-    // 🚨 Check global limit
-    if (totalHintsUsed >= 3) {
-        document.getElementById("hintDisplay").innerText = "⚠️ You have used all 3 hints!";
-        return;
-    }
-
-    // 🚨 Check if already unlocked for this level
-    if (unlockedHints[level]) {
-        // Just re-show the hint, don’t consume a new one
-        const levelRef = doc(db, "answers", level.toString());
-        const levelSnap = await getDoc(levelRef);
-        if (levelSnap.exists()) {
-            const hints = levelSnap.data().hints || [];
-            document.getElementById("hintDisplay").innerText = `💡 Hint: ${hints[0] || "No hint available"}`;
-        }
-        return;
-    }
-
-    // ✅ Otherwise, unlock hint for this level
-    const levelRef = doc(db, "answers", level.toString());
-    const levelSnap = await getDoc(levelRef);
-
-    if (!levelSnap.exists()) {
-        document.getElementById("hintDisplay").innerText = "⚠️ No hint found for this level.";
-        return;
-    }
-
-    const hints = levelSnap.data().hints || [];
-    if (hints.length === 0) {
-        document.getElementById("hintDisplay").innerText = "⚠️ No hints set for this riddle.";
-        return;
-    }
-
-    const hint = hints[0]; // 👈 Only 1 hint per level
-    document.getElementById("hintDisplay").innerText = `💡 Hint: ${hint}`;
-
-    // Update Firestore: consume 1 global hint + mark unlocked for this level
-    await updateDoc(playerRef, {
-        hintsUsed: totalHintsUsed + 1,
-        [`hintsUnlocked.${level}`]: true
+    // Update user progress
+    await updateDoc(userRef, {
+      currentLevel: currentLevel + 1,
+      score: increment(10), // +10 points per correct answer
     });
 
-    // Update counter in UI
-    document.getElementById("hintCounter").innerText = `Hints used: ${totalHintsUsed + 1}/3`;
-}
-
-
-// ✅ Ensure Users Stay Logged In & Redirect to Their Level
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        console.log("✅ User is already logged in:", user.email);
-
-        const playerRef = doc(db, "players", user.uid);
-        const playerSnap = await getDoc(playerRef);
-
-        if (playerSnap.exists()) {
-            const lastLevel = playerSnap.data().level || 2;
-            const urlParams = new URLSearchParams(window.location.search);
-            const currentLevel = parseInt(urlParams.get("level")) || 2;
-
-            if (lastLevel !== currentLevel) {
-                console.log(`🔄 Redirecting user to their correct level: ${lastLevel}`);
-                window.location.href = `level.html?level=${lastLevel}`;
-            } else {
-                console.log(`✅ User is already on the correct level: ${currentLevel}`);
-                const riddle = await getRiddle(currentLevel);
-                if (!riddle) {
-                    console.warn(`⚠ No riddle found for Level ${currentLevel}. Redirecting to waiting page...`);
-                    window.location.href = `waiting.html?level=${currentLevel}`;
-                }
-            }
-        }
-    }
+    // Small delay before loading next level
+    setTimeout(() => {
+      loadLevel(currentLevel + 1);
+    }, 1500);
+  } else {
+    feedbackEl.textContent = "❌ Incorrect answer. Try again!";
+  }
 });
