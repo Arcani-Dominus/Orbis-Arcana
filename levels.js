@@ -91,6 +91,62 @@ async function submitAnswer() {
     }
 }
 
+// ✅ Get a hint for the current level
+async function getHint(level) {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("You must be logged in to use hints.");
+        return;
+    }
+
+    const playerRef = doc(db, "players", user.uid);
+    const playerSnap = await getDoc(playerRef);
+
+    if (!playerSnap.exists()) return;
+    const playerData = playerSnap.data();
+
+    let totalHintsUsed = playerData.hintsUsed || 0;
+    if (totalHintsUsed >= 3) {
+        document.getElementById("hintDisplay").innerText = "⚠️ You have used all 3 hints!";
+        return;
+    }
+
+    // Check how many hints already unlocked for this level
+    const hintsUnlocked = playerData.hintsUnlocked || {};
+    const usedForThisLevel = hintsUnlocked[level] || 0;
+
+    // Get hints from Firestore
+    const levelRef = doc(db, "answers", level.toString());
+    const levelSnap = await getDoc(levelRef);
+
+    if (!levelSnap.exists()) {
+        document.getElementById("hintDisplay").innerText = "⚠️ No hints found for this level.";
+        return;
+    }
+
+    const levelData = levelSnap.data();
+    const hints = levelData.hints || [];
+
+    if (usedForThisLevel >= hints.length) {
+        document.getElementById("hintDisplay").innerText = "⚠️ No more hints available for this level.";
+        return;
+    }
+
+    // Get next hint
+    const hint = hints[usedForThisLevel];
+
+    // Update Firestore
+    await updateDoc(playerRef, {
+        hintsUsed: totalHintsUsed + 1,
+        [`hintsUnlocked.${level}`]: usedForThisLevel + 1
+    });
+
+    // Show hint + counter
+    document.getElementById("hintDisplay").innerText = hint;
+    document.getElementById("hintCounter").innerText = `Hints used: ${totalHintsUsed + 1}/3`;
+}
+
+
 // ✅ Ensure Users Stay Logged In & Redirect to Their Level
 onAuthStateChanged(auth, async (user) => {
     if (user) {
